@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// 動的ルートでは prefixed コンポーネントの自動解決がページ変換に乗らず、ヘッダーだけ出て本体が空になることがある
+import VideoDetailMetaInputs from '~/components/video-detail/MetaInputs.vue'
+import VideoDetailPlayer from '~/components/video-detail/Player.vue'
+import VideoDetailSidePane from '~/components/video-detail/SidePane.vue'
 import { productName } from '~/mocks/dashboard'
 import {
   cancelButtonLabel,

@@ -13,6 +13,8 @@ export const publishToggleLabel = '動画を公開する'
 export const streamUrlSectionTitle = 'ストリームURL'
 export const copyButtonLabel = 'コピー'
 export const metadataSectionTitle = 'メタデータ（読み取り専用）'
+// public/video に置いたモック動画。ファイル名の日本語と①を維持する
+export const videoPlaybackSrc = '/video/テスト用動画①.mp4'
 
 export const metadataRowLabels: readonly string[] = [
   'ステータス',

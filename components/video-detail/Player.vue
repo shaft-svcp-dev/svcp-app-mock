@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// 静止画サムネイルだけでは再生できないため、public のモック mp4 を video 要素で使う
+import { videoPlaybackSrc } from '~/mocks/video-detail'
 import type { VideoListItem } from '~/mocks/videos'
 
 defineProps<{
@@ -7,15 +9,14 @@ defineProps<{
 </script>
 
 <template>
-  <div
-    class="video-player-container"
-    :style="{
-      backgroundImage: `linear-gradient(0deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url(${video.thumbnailSrc})`,
-    }"
-    :aria-label="video.thumbnailAlt"
-  >
-    <button class="play-button" type="button">
-      <AppIcon name="play-circle" :size="32" />
-    </button>
+  <div class="video-player-container">
+    <video
+      class="video-player"
+      :src="videoPlaybackSrc"
+      :poster="video.thumbnailSrc"
+      :aria-label="video.thumbnailAlt"
+      controls
+      playsinline
+    />
   </div>
 </template>

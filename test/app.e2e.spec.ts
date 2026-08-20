@@ -24,12 +24,20 @@ import {
   streamUrlSectionTitle,
   titleFieldLabel,
   videoDetailTitle,
+  videoPlaybackSrc,
   visibilitySectionTitle,
 } from '../mocks/video-detail'
 
 function firstAnchorWithHref(html: string, href: string): string | undefined {
   const escapedHref = href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   return html.match(new RegExp(`<a[^>]*href="${escapedHref}"[^>]*>`))?.[0]
+}
+
+async function stylesheetText(html: string): Promise<string> {
+  const hrefs = [...html.matchAll(/href="([^"]+\.css[^"]*)"/g)].map(match => match[1])
+  const inline = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1])
+  const linked = await Promise.all(hrefs.map(href => $fetch<string>(href).catch(() => '')))
+  return [...inline, ...linked].join('\n')
 }
 
 describe('SVCP mock screens', async () => {
@@ -148,6 +156,19 @@ describe('SVCP mock screens', async () => {
       new RegExp(`<a[^>]*href="/videos"[^>]*>[\\s\\S]*?${cancelButtonLabel}`),
     )
     expect(html).toContain('video-player-container')
-    expect(html).toContain('play-button')
+    expect(html).toMatch(/<video\b/)
+    expect(
+      html.includes(videoPlaybackSrc) || html.includes(encodeURI(videoPlaybackSrc)),
+    ).toBe(true)
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.video-player-container\{[^}]*width:50%/)
+    expect(css).toMatch(/\.video-player-container\{[^}]*aspect-ratio:16\/9/)
+    expect(css).toMatch(/\.video-player-container\{[^}]*align-self:center/)
+    // 1440px 固定と overflow で右ペインがクリップされないこと
+    expect(css).toMatch(/\.screen-video-detail\{[^}]*min-width:0/)
+    expect(css).toMatch(/\.screen-video-detail\.page-body\{[^}]*min-width:0/)
+    expect(css).toMatch(/\.screen-video-detail\.main-content\{[^}]*overflow-x:visible/)
+    expect(css).toMatch(/\.right-pane\{[^}]*min-width:380px/)
   })
 })
