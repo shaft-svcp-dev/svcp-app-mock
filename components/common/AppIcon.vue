@@ -16,6 +16,10 @@ export type AppIconName =
   | 'file-stack'
   | 'check'
   | 'check-circle'
+  | 'briefcase'
+  | 'user'
+  | 'mail'
+  | 'lock'
 
 defineProps<{
   name: AppIconName
@@ -118,6 +122,22 @@ defineProps<{
       <path d="M21 6v6.5c0 .8-.7 1.5-1.5 1.5h-7c-.8 0-1.5-.7-1.5-1.5v-9c0-.8.7-1.5 1.5-1.5H17Z" />
       <path d="M7 8v8.8c0 .3.2.6.4.8.2.2.5.4.8.4H15" />
       <path d="M3 12v8.8c0 .3.2.6.4.8.2.2.5.4.8.4H11" />
+    </template>
+    <template v-else-if="name === 'briefcase'">
+      <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+      <rect width="20" height="14" x="2" y="6" rx="2" />
+    </template>
+    <template v-else-if="name === 'user'">
+      <circle cx="12" cy="8" r="5" />
+      <path d="M20 21a8 8 0 0 0-16 0" />
+    </template>
+    <template v-else-if="name === 'mail'">
+      <rect width="20" height="16" x="2" y="4" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </template>
+    <template v-else-if="name === 'lock'">
+      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </template>
   </svg>
 </template>

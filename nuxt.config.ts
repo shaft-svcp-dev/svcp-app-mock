@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '~/assets/css/video-detail.css',
     '~/assets/css/upload.css',
     '~/assets/css/login.css',
+    '~/assets/css/signup.css',
   ],
   components: [
     {
@@ -36,6 +37,10 @@ export default defineNuxtConfig({
     {
       path: '~/components/login',
       prefix: 'Login',
+    },
+    {
+      path: '~/components/signup',
+      prefix: 'Signup',
     },
   ],
   app: {

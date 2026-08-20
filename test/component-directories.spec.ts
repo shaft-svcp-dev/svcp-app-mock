@@ -28,6 +28,12 @@ const loginPage = import.meta.glob('../pages/login.vue', {
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
+const signupComponents = import.meta.glob('../components/signup/*.vue')
+const signupPage = import.meta.glob('../pages/signup.vue', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
 
 function fileNames(modules: Record<string, unknown>): string[] {
   return Object.keys(modules).map(path => path.split('/').at(-1) ?? path)
@@ -119,6 +125,26 @@ describe('component directories', () => {
     expect(source).toContain("~/components/login/Branding.vue")
     expect(source).toContain("~/components/login/FormFields.vue")
     expect(source).toContain("~/components/login/Submit.vue")
+    expect(source).toContain('layout: false')
+  })
+
+  it('places signup page components in components/signup', () => {
+    expect(fileNames(signupComponents).sort()).toEqual([
+      'Branding.vue',
+      'FormFields.vue',
+      'Submit.vue',
+      'TermsConsent.vue',
+    ])
+  })
+
+  it('imports signup components from the signup page without the shared chrome layout', () => {
+    // ページ名 Signup と prefix Signup* が重なると自動解決が乗らず、SSRとクライアントが食い違う
+    const source = Object.values(signupPage)[0]
+    expect(source).toBeDefined()
+    expect(source).toContain("~/components/signup/Branding.vue")
+    expect(source).toContain("~/components/signup/FormFields.vue")
+    expect(source).toContain("~/components/signup/TermsConsent.vue")
+    expect(source).toContain("~/components/signup/Submit.vue")
     expect(source).toContain('layout: false')
   })
 })

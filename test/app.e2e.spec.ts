@@ -54,6 +54,18 @@ import {
   signupPath,
   signupPromptLabel,
 } from '../mocks/login'
+import {
+  companyFieldLabel,
+  companyPlaceholder,
+  fullNameFieldLabel,
+  fullNamePlaceholder,
+  passwordConfirmFieldLabel,
+  requiredFieldLabel,
+  signupButtonLabel,
+  signupTagline,
+  signupTitle,
+  termsConsentLabel,
+} from '../mocks/signup'
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -116,6 +128,40 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.login-card.logo-mark\{[^}]*height:40px/)
   })
 
+  it('renders the signup screen from mock data without the shared chrome', async () => {
+    const html = await $fetch<string>('/signup')
+
+    expect(html).toContain(productName)
+    expect(html).toContain(signupTitle)
+    expect(html).toContain(signupTagline)
+    expect(html).toContain(companyFieldLabel)
+    expect(html).toContain(fullNameFieldLabel)
+    expect(html).toContain(emailFieldLabel)
+    expect(html).toContain(passwordFieldLabel)
+    expect(html).toContain(passwordConfirmFieldLabel)
+    expect(html).toContain(requiredFieldLabel)
+    expect(html).toContain(companyPlaceholder)
+    expect(html).toContain(fullNamePlaceholder)
+    expect(html).toContain(emailPlaceholder)
+    expect(html).toContain(passwordPlaceholder)
+    expect(html).toContain(termsConsentLabel)
+    expect(html).toContain(signupButtonLabel)
+    expect(html).not.toContain(dashboardUser.name)
+    expect(html).not.toContain('メインナビゲーション')
+    expect(html).toMatch(/<input[^>]*type="email"/)
+    expect(html).toMatch(/<input[^>]*type="checkbox"/)
+    expect((html.match(/<input[^>]*type="password"/g) ?? []).length).toBe(2)
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.screen-signup\{[^}]*justify-content:center/)
+    expect(css).toMatch(/\.screen-signup\{[^}]*background:#f8fafc/)
+    expect(css).toMatch(/\.registration-card\{[^}]*width:480px/)
+    expect(css).toMatch(/\.registration-card\{[^}]*border-radius:16px/)
+    expect(css).toMatch(/\.registration-card\{[^}]*box-shadow:012px32px#0f172a06/)
+    expect(css).toMatch(/\.registration-card.logo-mark\{[^}]*width:36px/)
+    expect(css).toMatch(/\.registration-card.logo-mark\{[^}]*height:36px/)
+  })
+
   it('sends unauthenticated visitors from the dashboard to the login screen', async () => {
     const html = await $fetch<string>('/')
 
@@ -123,6 +169,15 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(emailFieldLabel)
     expect(html).not.toContain('総動画数')
     expect(html).not.toContain(dashboardUser.name)
+  })
+
+  it('keeps authenticated visitors on the dashboard instead of the signup screen', async () => {
+    const html = await authenticatedFetch('/signup')
+
+    expect(html).toContain('総動画数')
+    expect(html).toContain(dashboardUser.name)
+    expect(html).not.toContain(signupTitle)
+    expect(html).not.toContain(companyFieldLabel)
   })
 
   it('renders the dashboard chrome, stats, and recent uploads from mock data', async () => {
