@@ -420,12 +420,8 @@ body {
   background: #ecfdf5;
 }
 
-.badge-processing {
+.badge-unpublished {
   background: #fef3c7;
-}
-
-.badge-draft {
-  background: #e2e8f0;
 }
 
 .badge-label {
@@ -438,10 +434,6 @@ body {
   color: #10b981;
 }
 
-.badge-processing .badge-label {
+.badge-unpublished .badge-label {
   color: #f59e0b;
-}
-
-.badge-draft .badge-label {
-  color: #475569;
 }

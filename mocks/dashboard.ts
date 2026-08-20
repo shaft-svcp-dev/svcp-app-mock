@@ -8,7 +8,7 @@ export type StatIconName = 'file-video' | 'badge-check' | 'loader' | 'chart-line
 
 export type StatTone = 'blue' | 'green' | 'amber'
 
-export type VideoStatus = 'published' | 'processing' | 'draft'
+export type VideoStatus = 'published' | 'unpublished'
 
 export interface DashboardNavItem {
   id: string
@@ -54,16 +54,14 @@ export const totalPlayCountStatLabel = '総再生回数'
 
 export const videoStatusLabel: Record<VideoStatus, string> = {
   published: '公開中',
-  processing: '非公開中',
-  draft: '下書き',
+  unpublished: '非公開中',
 }
 
 export function buildDashboardStats(
   videos: readonly { status: VideoStatus }[],
 ): DashboardStat[] {
   const publishedCount = videos.filter(video => video.status === 'published').length
-  // 公開中／非公開中は対になる件数。下書きも公開前なので非公開中に含める
-  const unpublishedCount = videos.filter(video => video.status !== 'published').length
+  const unpublishedCount = videos.filter(video => video.status === 'unpublished').length
 
   return [
     {
@@ -82,7 +80,7 @@ export function buildDashboardStats(
     },
     {
       id: 'unpublished',
-      label: videoStatusLabel.processing,
+      label: videoStatusLabel.unpublished,
       value: String(unpublishedCount),
       icon: 'loader',
       tone: 'amber',
@@ -132,7 +130,7 @@ export const recentUploads: readonly RecentUpload[] = [
     duration: '再生時間 18:05',
     size: 'ファイルサイズ 312.4MB',
     uploadedAt: '5日前',
-    status: 'processing',
+    status: 'unpublished',
     thumbnailSrc: '/images/thumb-training.png',
     thumbnailAlt: '社内研修動画のサムネイル',
   },

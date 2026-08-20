@@ -26,8 +26,7 @@ export const statusFilterOptions: readonly {
 }[] = [
   { value: 'all', label: 'すべてのステータス' },
   { value: 'published', label: videoStatusLabel.published },
-  { value: 'processing', label: videoStatusLabel.processing },
-  { value: 'draft', label: videoStatusLabel.draft },
+  { value: 'unpublished', label: videoStatusLabel.unpublished },
 ]
 
 export const videoTableColumns: readonly { id: string, label: string }[] = [
@@ -67,7 +66,7 @@ export const videoListItems: readonly VideoListItem[] = [
     duration: '15:20',
     size: '284.1 MB',
     uploadedAt: '2026/03/10 13:05',
-    status: 'processing',
+    status: 'unpublished',
     thumbnailSrc: '/images/thumb-training-distribution.png',
     thumbnailAlt: '社内研修動画のサムネイル',
   },
@@ -91,7 +90,7 @@ export const videoListItems: readonly VideoListItem[] = [
     duration: '08:12',
     size: '192.4 MB',
     uploadedAt: '2026/03/09 17:45',
-    status: 'draft',
+    status: 'unpublished',
     thumbnailSrc: '/images/thumb-interview.png',
     thumbnailAlt: 'オンライン面談動画のサムネイル',
   },

@@ -211,17 +211,18 @@ describe('SVCP mock screens', async () => {
     )
     expect(html).toContain(totalVideosStatLabel)
     expect(html).toContain(videoStatusLabel.published)
-    expect(html).toContain(videoStatusLabel.processing)
+    expect(html).toContain(videoStatusLabel.unpublished)
     expect(html).toContain(totalPlayCountStatLabel)
     expect(html).not.toContain('公開済')
     expect(html).not.toContain('処理中')
+    expect(html).not.toContain('下書き')
     expect(html).not.toContain('ストレージ')
     expect(html).not.toContain('12.4 GB')
     expect(html).not.toContain('128')
     expect(statValues(html)).toEqual([
       String(videoListItems.length),
       String(videoListItems.filter(video => video.status === 'published').length),
-      String(videoListItems.filter(video => video.status !== 'published').length),
+      String(videoListItems.filter(video => video.status === 'unpublished').length),
       '0',
     ])
     expect(html).toContain('最近のアップロード')
@@ -275,6 +276,13 @@ describe('SVCP mock screens', async () => {
     for (const option of statusFilterOptions) {
       expect(html).toContain(option.label)
     }
+
+    expect(statusFilterOptions.map(option => option.value)).toEqual([
+      'all',
+      'published',
+      'unpublished',
+    ])
+    expect(html).not.toContain('下書き')
 
     const listCss = (await stylesheetText(html)).replace(/\s+/g, '')
     // 固定幅だと「すべてのステータス」「アップロード日時」が2行・見切れになる
