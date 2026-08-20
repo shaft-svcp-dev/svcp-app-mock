@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '~/assets/css/video-list.css',
     '~/assets/css/video-detail.css',
     '~/assets/css/upload.css',
+    '~/assets/css/login.css',
   ],
   components: [
     {
@@ -31,6 +32,10 @@ export default defineNuxtConfig({
     {
       path: '~/components/upload',
       prefix: 'Upload',
+    },
+    {
+      path: '~/components/login',
+      prefix: 'Login',
     },
   ],
   app: {

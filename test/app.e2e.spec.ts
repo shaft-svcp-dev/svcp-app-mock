@@ -2,6 +2,7 @@ import { $fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import {
   dashboardUser,
+  productName,
   uploadButtonLabel,
   videoStatusLabel,
 } from '../mocks/dashboard'
@@ -39,6 +40,19 @@ import {
   videoPlaybackSrc,
   visibilitySectionTitle,
 } from '../mocks/video-detail'
+import {
+  authCookieName,
+  authCookieValue,
+  emailFieldLabel,
+  emailPlaceholder,
+  loginButtonLabel,
+  loginTagline,
+  passwordFieldLabel,
+  passwordPlaceholder,
+  signupLinkLabel,
+  signupPath,
+  signupPromptLabel,
+} from '../mocks/login'
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -55,13 +69,59 @@ async function stylesheetText(html: string): Promise<string> {
   return [...inline, ...linked].join('\n')
 }
 
+function authenticatedFetch(path: string) {
+  return $fetch<string>(path, {
+    headers: {
+      cookie: `${authCookieName}=${authCookieValue}`,
+    },
+  })
+}
+
 describe('SVCP mock screens', async () => {
   await setup({
     rootDir: '.',
   })
 
-  it('renders the dashboard chrome, stats, and recent uploads from mock data', async () => {
+  it('renders the login screen from mock data without the shared chrome', async () => {
+    const html = await $fetch<string>('/login')
+
+    expect(html).toContain(productName)
+    expect(html).not.toContain('VideoHub')
+    expect(html).toContain(loginTagline)
+    expect(html).toContain(emailFieldLabel)
+    expect(html).toContain(passwordFieldLabel)
+    expect(html).toContain(emailPlaceholder)
+    expect(html).toContain(passwordPlaceholder)
+    expect(html).toContain(loginButtonLabel)
+    expect(html).toContain(signupPromptLabel)
+    expect(html).toContain(signupLinkLabel)
+    expect(firstAnchorWithHref(html, signupPath)).toBeDefined()
+    expect(html).not.toContain(dashboardUser.name)
+    expect(html).not.toContain('メインナビゲーション')
+    expect(html).toMatch(/<input[^>]*type="email"/)
+    expect(html).toMatch(/<input[^>]*type="password"/)
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.screen-login\{[^}]*justify-content:center/)
+    expect(css).toMatch(/\.screen-login\{[^}]*background:#f8fafc/)
+    expect(css).toMatch(/\.login-card\{[^}]*width:440px/)
+    expect(css).toMatch(/\.login-card\{[^}]*border-radius:16px/)
+    expect(css).toMatch(/\.login-card\{[^}]*box-shadow:08px24px#00000008/)
+    expect(css).toMatch(/\.login-card.logo-mark\{[^}]*width:40px/)
+    expect(css).toMatch(/\.login-card.logo-mark\{[^}]*height:40px/)
+  })
+
+  it('sends unauthenticated visitors from the dashboard to the login screen', async () => {
     const html = await $fetch<string>('/')
+
+    expect(html).toContain(loginButtonLabel)
+    expect(html).toContain(emailFieldLabel)
+    expect(html).not.toContain('総動画数')
+    expect(html).not.toContain(dashboardUser.name)
+  })
+
+  it('renders the dashboard chrome, stats, and recent uploads from mock data', async () => {
+    const html = await authenticatedFetch('/')
 
     expect(html).toContain('SVCP')
     expect(html).not.toContain('VideoHub')
@@ -96,7 +156,7 @@ describe('SVCP mock screens', async () => {
   })
 
   it('renders the video list from mock data with video-list nav active', async () => {
-    const html = await $fetch<string>('/videos')
+    const html = await authenticatedFetch('/videos')
 
     expect(html).toContain(videoListTitle)
     expect(html).toContain(dashboardUser.name)
@@ -145,7 +205,7 @@ describe('SVCP mock screens', async () => {
 
   it('renders the video detail from list mock data with video-list nav active', async () => {
     const video = videoListItems[0]
-    const html = await $fetch<string>(`/videos/${video.id}`)
+    const html = await authenticatedFetch(`/videos/${video.id}`)
 
     expect(html).toContain(videoDetailTitle)
     expect(html).toContain(cancelButtonLabel)
@@ -182,7 +242,7 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(dashboardUser.role)
 
     const otherVideo = videoListItems[1]
-    const otherHtml = await $fetch<string>(`/videos/${otherVideo.id}`)
+    const otherHtml = await authenticatedFetch(`/videos/${otherVideo.id}`)
     expect(otherHtml).toMatch(
       new RegExp(`<textarea[^>]*>\\s*${escapeRegExp(otherVideo.description)}\\s*</textarea>`),
     )
@@ -222,7 +282,7 @@ describe('SVCP mock screens', async () => {
   })
 
   it('renders the upload screen from mock data with upload nav active', async () => {
-    const html = await $fetch<string>('/upload')
+    const html = await authenticatedFetch('/upload')
 
     expect(html).toContain(uploadButtonLabel)
     expect(html).toContain(dashboardUser.name)

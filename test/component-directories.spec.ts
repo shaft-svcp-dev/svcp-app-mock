@@ -22,6 +22,12 @@ const uploadPage = import.meta.glob('../pages/upload.vue', {
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
+const loginComponents = import.meta.glob('../components/login/*.vue')
+const loginPage = import.meta.glob('../pages/login.vue', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
 
 function fileNames(modules: Record<string, unknown>): string[] {
   return Object.keys(modules).map(path => path.split('/').at(-1) ?? path)
@@ -95,5 +101,23 @@ describe('component directories', () => {
     expect(source).toContain("~/components/upload/DropZone.vue")
     expect(source).toContain("~/components/upload/ConversionPipeline.vue")
     expect(source).toContain("~/components/upload/FileInfo.vue")
+  })
+
+  it('places login page components in components/login', () => {
+    expect(fileNames(loginComponents).sort()).toEqual([
+      'Branding.vue',
+      'FormFields.vue',
+      'Submit.vue',
+    ])
+  })
+
+  it('imports login components from the login page without the shared chrome layout', () => {
+    // ページ名 Login と prefix Login* が重なると自動解決が乗らず、SSRとクライアントが食い違う
+    const source = Object.values(loginPage)[0]
+    expect(source).toBeDefined()
+    expect(source).toContain("~/components/login/Branding.vue")
+    expect(source).toContain("~/components/login/FormFields.vue")
+    expect(source).toContain("~/components/login/Submit.vue")
+    expect(source).toContain('layout: false')
   })
 })
