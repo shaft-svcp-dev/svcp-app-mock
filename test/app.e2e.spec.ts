@@ -13,6 +13,19 @@ import {
   videoListTitle,
   videoTableColumns,
 } from '../mocks/videos'
+import {
+  cancelButtonLabel,
+  copyButtonLabel,
+  descriptionFieldLabel,
+  metadataSectionTitle,
+  metadataRowLabels,
+  publishToggleLabel,
+  saveButtonLabel,
+  streamUrlSectionTitle,
+  titleFieldLabel,
+  videoDetailTitle,
+  visibilitySectionTitle,
+} from '../mocks/video-detail'
 
 function firstAnchorWithHref(html: string, href: string): string | undefined {
   const escapedHref = href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -86,6 +99,7 @@ describe('SVCP mock screens', async () => {
       expect(html).toContain(`badge-${video.status}`)
       expect(html).toContain(video.thumbnailSrc)
       expect(html).toContain(video.thumbnailAlt)
+      expect(firstAnchorWithHref(html, `/videos/${video.id}`)).toBeDefined()
     }
 
     const dashboardNav = firstAnchorWithHref(html, '/')
@@ -93,5 +107,47 @@ describe('SVCP mock screens', async () => {
     expect(videosNav).toContain('nav-item-active')
     expect(videosNav).toContain('aria-current="page"')
     expect(dashboardNav).not.toContain('nav-item-active')
+  })
+
+  it('renders the video detail from list mock data with video-list nav active', async () => {
+    const video = videoListItems[0]
+    const html = await $fetch<string>(`/videos/${video.id}`)
+
+    expect(html).toContain(videoDetailTitle)
+    expect(html).toContain(cancelButtonLabel)
+    expect(html).toContain(saveButtonLabel)
+    expect(html).toContain(titleFieldLabel)
+    expect(html).toContain(descriptionFieldLabel)
+    expect(html).toContain(visibilitySectionTitle)
+    expect(html).toContain(publishToggleLabel)
+    expect(html).toContain(streamUrlSectionTitle)
+    expect(html).toContain(copyButtonLabel)
+    expect(html).toContain(metadataSectionTitle)
+
+    for (const label of metadataRowLabels) {
+      expect(html).toContain(label)
+    }
+
+    expect(html).toContain(video.title)
+    expect(html).toContain(video.duration)
+    expect(html).toContain(video.size)
+    expect(html).toContain(video.uploadedAt)
+    expect(html).toContain(videoStatusLabel[video.status])
+    expect(html).toContain(`badge-${video.status}`)
+    expect(html).toContain(video.thumbnailSrc)
+    expect(html).toContain(dashboardUser.name)
+    expect(html).toContain(dashboardUser.role)
+
+    const dashboardNav = firstAnchorWithHref(html, '/')
+    const videosNav = firstAnchorWithHref(html, '/videos')
+    expect(videosNav).toContain('nav-item-active')
+    expect(videosNav).toContain('aria-current="page"')
+    expect(dashboardNav).not.toContain('nav-item-active')
+
+    expect(html).toMatch(
+      new RegExp(`<a[^>]*href="/videos"[^>]*>[\\s\\S]*?${cancelButtonLabel}`),
+    )
+    expect(html).toContain('video-player-container')
+    expect(html).toContain('play-button')
   })
 })

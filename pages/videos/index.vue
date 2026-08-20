@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { productName } from '~/mocks/dashboard'
+import { productName, uploadButtonLabel } from '~/mocks/dashboard'
 import type { VideoListStatusFilter } from '~/mocks/videos'
 import { videoListItems, videoListTitle } from '~/mocks/videos'
+
+definePageMeta({
+  screenClass: 'screen-video-list',
+})
 
 useHead({
   title: `${videoListTitle} | ${productName}`,
@@ -29,17 +33,19 @@ const visibleVideos = computed(() => {
 </script>
 
 <template>
-  <div class="screen-video-list">
-    <AppSidebar />
-    <div class="main-content">
-      <VideoListHeader />
-      <div class="page-body">
-        <VideoListFilterRow
-          v-model:query="query"
-          v-model:status-filter="statusFilter"
-        />
-        <VideoListTable :videos="visibleVideos" />
-      </div>
-    </div>
+  <AppHeader :title="videoListTitle">
+    <template #actions>
+      <NuxtLink class="btn" to="/upload">
+        <AppIcon name="plus" :size="16" />
+        <span class="btn-label">{{ uploadButtonLabel }}</span>
+      </NuxtLink>
+    </template>
+  </AppHeader>
+  <div class="page-body">
+    <VideoListFilterRow
+      v-model:query="query"
+      v-model:status-filter="statusFilter"
+    />
+    <VideoListTable :videos="visibleVideos" />
   </div>
 </template>

@@ -18,7 +18,8 @@ body {
 }
 
 .screen-dashboard,
-.screen-video-list {
+.screen-video-list,
+.screen-video-detail {
   display: flex;
   flex-direction: row;
   align-items: flex-start;

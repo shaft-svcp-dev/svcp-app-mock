@@ -21,10 +21,11 @@ defineProps<{
       </span>
     </div>
     <div class="table-body">
-      <article
+      <NuxtLink
         v-for="video in videos"
         :key="video.id"
         class="table-row"
+        :to="`/videos/${video.id}`"
       >
         <img
           class="col-thumbnail video-thumb"
@@ -40,7 +41,7 @@ defineProps<{
           </div>
         </div>
         <span class="col-uploadedAt table-cell">{{ video.uploadedAt }}</span>
-      </article>
+      </NuxtLink>
     </div>
   </div>
 </template>

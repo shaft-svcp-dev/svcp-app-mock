@@ -8,7 +8,12 @@ import {
 const route = useRoute()
 
 function isActiveNav(to: string): boolean {
-  return route.path === to
+  // 動画詳細 `/videos/:id` でも一覧ナビを選択状態にする（Figma の video-list active）
+  if (to === '/') {
+    return route.path === '/'
+  }
+
+  return route.path === to || route.path.startsWith(`${to}/`)
 }
 </script>
 

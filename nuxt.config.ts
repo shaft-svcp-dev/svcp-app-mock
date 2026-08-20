@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
-  css: ['~/assets/css/dashboard.css', '~/assets/css/video-list.css'],
+  css: ['~/assets/css/dashboard.css', '~/assets/css/video-list.css', '~/assets/css/video-detail.css'],
   components: [
     {
       path: '~/components/common',
@@ -18,6 +18,10 @@ export default defineNuxtConfig({
     {
       path: '~/components/video-list',
       prefix: 'VideoList',
+    },
+    {
+      path: '~/components/video-detail',
+      prefix: 'VideoDetail',
     },
   ],
   app: {
