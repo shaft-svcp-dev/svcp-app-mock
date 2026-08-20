@@ -9,7 +9,7 @@ import {
 
 <template>
   <div class="screen-dashboard">
-    <DashboardSidebar />
+    <AppSidebar />
     <div class="main-content">
       <DashboardHeader />
       <div class="page-body">

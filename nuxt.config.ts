@@ -4,6 +4,18 @@ export default defineNuxtConfig({
     enabled: true,
   },
   css: ['~/assets/css/dashboard.css'],
+  components: [
+    {
+      path: '~/components/common',
+      // 共通コンポーネントはディレクトリ名を接頭辞にせず <AppIcon> のまま使う
+      pathPrefix: false,
+    },
+    {
+      path: '~/components/dashboard',
+      // ページ専用コンポーネントは <DashboardHeader> のようにページ名を接頭辞にする
+      prefix: 'Dashboard',
+    },
+  ],
   app: {
     head: {
       title: 'ダッシュボード | SVCP',
