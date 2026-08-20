@@ -190,6 +190,15 @@ body {
   gap: 16px;
 }
 
+.header-logout {
+  /* Figma に無い操作。既存の outline ボタンに合わせ、CJK が見切れないよう内容幅にする */
+  width: auto;
+  height: 37px;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 .btn {
   display: flex;
   flex-direction: row;

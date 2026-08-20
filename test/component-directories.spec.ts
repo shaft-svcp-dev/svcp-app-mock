@@ -37,6 +37,7 @@ describe('component directories', () => {
   it('places shared components in components/common', () => {
     expect(fileNames(commonComponents).sort()).toEqual([
       'AppHeader.vue',
+      'AppHeaderActions.vue',
       'AppIcon.vue',
       'AppSidebar.vue',
     ])

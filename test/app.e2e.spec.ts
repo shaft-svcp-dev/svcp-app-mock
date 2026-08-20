@@ -2,6 +2,7 @@ import { $fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import {
   dashboardUser,
+  logoutButtonLabel,
   productName,
   uploadButtonLabel,
   videoStatusLabel,
@@ -77,6 +78,10 @@ function authenticatedFetch(path: string) {
   })
 }
 
+function headerActionsHtml(html: string): string {
+  return html.match(/<div class="header-actions">[\s\S]*?<\/div>/)?.[0] ?? ''
+}
+
 describe('SVCP mock screens', async () => {
   await setup({
     rootDir: '.',
@@ -132,6 +137,13 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain('田中 太郎')
     expect(html).toContain('プロダクトマネージャー')
     expect(html).toContain('動画をアップロード')
+    expect(html).toContain(logoutButtonLabel)
+
+    const headerActions = headerActionsHtml(html)
+    expect(headerActions.indexOf(uploadButtonLabel)).toBeGreaterThanOrEqual(0)
+    expect(headerActions.indexOf(logoutButtonLabel)).toBeGreaterThan(
+      headerActions.indexOf(uploadButtonLabel),
+    )
     expect(html).toContain('総動画数')
     expect(html).toContain('128')
     expect(html).toContain('公開済')
@@ -162,6 +174,13 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(dashboardUser.name)
     expect(html).toContain(dashboardUser.role)
     expect(html).toContain(uploadButtonLabel)
+    expect(html).toContain(logoutButtonLabel)
+
+    const headerActions = headerActionsHtml(html)
+    expect(headerActions.indexOf(uploadButtonLabel)).toBeGreaterThanOrEqual(0)
+    expect(headerActions.indexOf(logoutButtonLabel)).toBeGreaterThan(
+      headerActions.indexOf(uploadButtonLabel),
+    )
     expect(html).toContain(searchPlaceholder)
     expect(html).toContain(sortButtonLabel)
 

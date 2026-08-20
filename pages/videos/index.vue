@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { productName, uploadButtonLabel } from '~/mocks/dashboard'
+import { productName } from '~/mocks/dashboard'
 import type { VideoListStatusFilter } from '~/mocks/videos'
 import { videoListItems, videoListTitle } from '~/mocks/videos'
 
@@ -35,10 +35,7 @@ const visibleVideos = computed(() => {
 <template>
   <AppHeader :title="videoListTitle">
     <template #actions>
-      <NuxtLink class="btn" to="/upload">
-        <AppIcon name="plus" :size="16" />
-        <span class="btn-label">{{ uploadButtonLabel }}</span>
-      </NuxtLink>
+      <AppHeaderActions />
     </template>
   </AppHeader>
   <div class="page-body">

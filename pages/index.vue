@@ -4,7 +4,6 @@ import {
   dashboardTitle,
   recentSectionTitle,
   recentUploads,
-  uploadButtonLabel,
   viewAllLabel,
 } from '~/mocks/dashboard'
 
@@ -16,10 +15,7 @@ definePageMeta({
 <template>
   <AppHeader :title="dashboardTitle">
     <template #actions>
-      <NuxtLink class="btn" to="/upload">
-        <AppIcon name="plus" :size="16" />
-        <span class="btn-label">{{ uploadButtonLabel }}</span>
-      </NuxtLink>
+      <AppHeaderActions />
     </template>
   </AppHeader>
   <div class="page-body">

@@ -46,6 +46,7 @@ export interface RecentUpload {
 export const productName = 'SVCP'
 export const dashboardTitle = 'ダッシュボード'
 export const uploadButtonLabel = '動画をアップロード'
+export const logoutButtonLabel = 'ログアウト'
 export const recentSectionTitle = '最近のアップロード'
 export const viewAllLabel = 'すべて見る'
 
