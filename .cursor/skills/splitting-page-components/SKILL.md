@@ -3,7 +3,7 @@ name: splitting-page-components
 description: >-
   画面ごとのディレクトリにページ専用コンポーネントを分け、共通部品は components/common に置く。
   新しい画面（アップロード、設定など）の実装、コンポーネント分割、FilterRow のようなブロック抽出、
-  Nuxt の prefix 設定、モックと CSS の配置を行うときに使用する。
+  Nuxt の prefix 設定、layouts（複数画面で同じシェルを共有する場合のみ）、モックと CSS の配置を行うときに使用する。
 ---
 
 # ページ単位でコンポーネントを分ける
@@ -19,6 +19,7 @@ description: >-
 | 共通 | `components/common/` | `App*.vue` | `<AppIcon>`（`pathPrefix: false`） |
 | ページ専用 | `components/<画面>/` | 接頭辞なし（`Header.vue`） | `<VideoListHeader>`（`nuxt.config` の `prefix`） |
 | ページ | `pages/` | ルートに合わせる（`videos.vue` → `/videos`） | — |
+| レイアウト | `layouts/` | 下記の共有条件を満たすときだけ | — |
 | モック | `mocks/` | 画面ドメイン（`videos.ts`, `dashboard.ts`） | — |
 | 画面CSS | `assets/css/<画面>.css` | ディレクトリ名（`video-list.css`） | — |
 
@@ -27,7 +28,7 @@ description: >-
 - `prefix` はディレクトリ名の PascalCase（`video-list` → `VideoList`）。ファイル名に画面名を重複させない（`Table.vue` であり `VideoListTable.vue` ではない）。
 - ルート要素クラスは `screen-<画面>`（`screen-video-list`）。
 - 共通に置くのは **2画面以上** で使うものだけ（現状 `AppSidebar`, `AppIcon`）。見た目が似ていても1画面専用ならその画面のディレクトリに置く（各 `Header.vue` は共有しない）。
-- `layouts/` は使わない。各ページが `AppSidebar` と `main-content` を組み立てる。`app.vue` は `NuxtPage` のみ。
+- layoutsは必要に応じて使用してもいいです。複数画面同じものを使用するという場合に限ってですが。1画面だけのシェルはページ（またはその画面のコンポーネント）に残す。`app.vue` は `NuxtPage` のみ。
 
 `nuxt.config.ts` の登録例:
 
@@ -44,11 +45,30 @@ description: >-
 
 新しい画面では同じ形で `path` と `prefix` を追加する。
 
+## layouts を切り出すか
+
+外側の枠（サイドバー、ヘッダーシェルなど）が **2画面以上で同一** のときだけ `layouts/` に出す。1画面用に「念のため」作らない。
+
+**切り出す:**
+
+- [ ] 対象のページが2つ以上ある（これから同時に足す場合を含む）
+- [ ] 共有するのは同一の外側の枠であり、似ているだけではない
+- [ ] その同一構造をページ間で重複させないために出す
+
+**切り出さない:**
+
+- [ ] その構造を使うページが1つだけ
+- [ ] 画面ごとに Header や枠が違う（似ていても各画面の `Header.vue` に置く）
+- [ ] 将来の画面のために先回りする
+- [ ] 1画面の整理目的だけで layout を増やす
+
+条件を満たさない間は、各ページが `AppSidebar` と `main-content` を組み立てる。
+
 ## 何を抽出し、何をページに残すか
 
 **ページ**（`pages/*.vue`）が持つもの:
 
-- 画面シェル: `screen-*` / `AppSidebar` / `main-content` / `page-body` と、切り出した子の組み立て
+- 画面シェル: `screen-*` / `AppSidebar` / `main-content` / `page-body` と、切り出した子の組み立て。上記の layout 条件を満たす共有の外側の枠は `layouts/` が持ち、ページには置かない
 - セクションの枠（`.stats-row`, `.recent-section`, `.sec-header` など）
 - `useHead`、画面の UI 状態、リストの絞り込み・ソート
 - モックの **レコード配列** の import
@@ -89,7 +109,7 @@ description: >-
 2. `test/component-directories.spec.ts` にディレクトリの glob と期待ファイル名を追加する（直下 `.vue` は空のまま）。
 3. `mocks/<画面>.ts` にデザインどおりのレコードと文言を置く。
 4. `nuxt.config.ts` に `components` の `prefix` と `css` を足す。
-5. ページでシェルを組み立て、状態と配列の派生を書く。
+5. ページでシェルを組み立て、状態と配列の派生を書く。複数画面が同じ外側の枠を共有する場合のみ `layouts/` に出し、1画面ならページに残す。
 6. 子は表示と入力だけにする。
 7. `test/app.e2e.spec.ts` でページHTMLをモック値に対して検証する。子コンポーネント単体テストは追加しない。
 
