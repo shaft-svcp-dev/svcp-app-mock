@@ -1,7 +1,7 @@
 /**
  * UIモック。API未接続のため、画面表示専用の固定データ。
  * ラベルは Figma `screen-video-detail` のテキスト幅（CJK 1em）から取る。
- * レコード値は動画一覧の該当行を使い、CSS に無い説明文・ストリームURLは置かない。
+ * レコード値（タイトル、説明、ストリームURL、メタデータ）は動画一覧の該当行を使う。
  */
 export const videoDetailTitle = '動画詳細'
 export const cancelButtonLabel = 'キャンセル'

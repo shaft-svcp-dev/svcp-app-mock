@@ -10,12 +10,16 @@ import {
   visibilitySectionTitle,
 } from '~/mocks/video-detail'
 
-defineProps<{
+const props = defineProps<{
   video: VideoListItem
 }>()
 
 const [statusRowLabel, durationRowLabel, uploadedAtRowLabel, fileSizeRowLabel]
   = metadataRowLabels
+
+function copyStreamUrl() {
+  void navigator.clipboard.writeText(props.video.streamUrl)
+}
 </script>
 
 <template>
@@ -43,8 +47,8 @@ const [statusRowLabel, durationRowLabel, uploadedAtRowLabel, fileSizeRowLabel]
         {{ streamUrlSectionTitle }}
       </h2>
       <div class="url-container">
-        <span class="m3u8-url" />
-        <button class="copy-btn" type="button">
+        <span class="m3u8-url">{{ video.streamUrl }}</span>
+        <button class="copy-btn" type="button" @click="copyStreamUrl">
           <AppIcon name="file-stack" :size="14" />
           <span class="copy-label">{{ copyButtonLabel }}</span>
         </button>

@@ -30,8 +30,7 @@ useHead({
 })
 
 const title = ref(video.title)
-// Figma の説明欄には2行分のテキスト枠があるが、文言は CSS / 既存モックに無い
-const description = ref('')
+const description = ref(video.description)
 </script>
 
 <template>

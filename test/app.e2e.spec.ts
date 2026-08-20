@@ -28,9 +28,12 @@ import {
   visibilitySectionTitle,
 } from '../mocks/video-detail'
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 function firstAnchorWithHref(html: string, href: string): string | undefined {
-  const escapedHref = href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  return html.match(new RegExp(`<a[^>]*href="${escapedHref}"[^>]*>`))?.[0]
+  return html.match(new RegExp(`<a[^>]*href="${escapeRegExp(href)}"[^>]*>`))?.[0]
 }
 
 async function stylesheetText(html: string): Promise<string> {
@@ -137,6 +140,14 @@ describe('SVCP mock screens', async () => {
     }
 
     expect(html).toContain(video.title)
+    expect(html).toMatch(
+      new RegExp(`<textarea[^>]*>\\s*${escapeRegExp(video.description)}\\s*</textarea>`),
+    )
+    expect(html).toMatch(
+      new RegExp(
+        `<span[^>]*class="m3u8-url"[^>]*>\\s*${escapeRegExp(video.streamUrl)}\\s*</span>\\s*<button[^>]*class="copy-btn"`,
+      ),
+    )
     expect(html).toContain(video.duration)
     expect(html).toContain(video.size)
     expect(html).toContain(video.uploadedAt)
@@ -145,6 +156,15 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(video.thumbnailSrc)
     expect(html).toContain(dashboardUser.name)
     expect(html).toContain(dashboardUser.role)
+
+    const otherVideo = videoListItems[1]
+    const otherHtml = await $fetch<string>(`/videos/${otherVideo.id}`)
+    expect(otherHtml).toMatch(
+      new RegExp(`<textarea[^>]*>\\s*${escapeRegExp(otherVideo.description)}\\s*</textarea>`),
+    )
+    expect(otherHtml).toContain(otherVideo.streamUrl)
+    expect(otherHtml).not.toContain(video.description)
+    expect(otherHtml).not.toContain(video.streamUrl)
 
     const dashboardNav = firstAnchorWithHref(html, '/')
     const videosNav = firstAnchorWithHref(html, '/videos')
