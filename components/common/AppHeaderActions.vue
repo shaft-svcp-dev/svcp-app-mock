@@ -10,7 +10,7 @@ async function onLogout() {
 </script>
 
 <template>
-  <NuxtLink class="btn" to="/upload">
+  <NuxtLink class="btn header-upload" to="/upload">
     <AppIcon name="plus" :size="16" />
     <span class="btn-label">{{ uploadButtonLabel }}</span>
   </NuxtLink>

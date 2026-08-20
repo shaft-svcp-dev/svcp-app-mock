@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import {
-  dashboardStats,
+  buildDashboardStats,
   dashboardTitle,
   recentSectionTitle,
   recentUploads,
   viewAllLabel,
 } from '~/mocks/dashboard'
+import { videoListItems } from '~/mocks/videos'
 
 definePageMeta({
   screenClass: 'screen-dashboard',
 })
+
+const dashboardStats = buildDashboardStats(videoListItems)
 </script>
 
 <template>

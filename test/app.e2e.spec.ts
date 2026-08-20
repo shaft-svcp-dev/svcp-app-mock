@@ -4,6 +4,8 @@ import {
   dashboardUser,
   logoutButtonLabel,
   productName,
+  totalPlayCountStatLabel,
+  totalVideosStatLabel,
   uploadButtonLabel,
   videoStatusLabel,
 } from '../mocks/dashboard'
@@ -94,6 +96,10 @@ function authenticatedFetch(path: string) {
 
 function headerActionsHtml(html: string): string {
   return html.match(/<div class="header-actions">[\s\S]*?<\/div>/)?.[0] ?? ''
+}
+
+function statValues(html: string): string[] {
+  return [...html.matchAll(/<span class="stat-value">([^<]*)<\/span>/g)].map(match => match[1])
 }
 
 describe('SVCP mock screens', async () => {
@@ -203,13 +209,21 @@ describe('SVCP mock screens', async () => {
     expect(headerActions.indexOf(logoutButtonLabel)).toBeGreaterThan(
       headerActions.indexOf(uploadButtonLabel),
     )
-    expect(html).toContain('総動画数')
-    expect(html).toContain('128')
-    expect(html).toContain('公開済')
-    expect(html).toContain('42')
-    expect(html).toContain('処理中')
-    expect(html).toContain('ストレージ')
-    expect(html).toContain('12.4 GB')
+    expect(html).toContain(totalVideosStatLabel)
+    expect(html).toContain(videoStatusLabel.published)
+    expect(html).toContain(videoStatusLabel.processing)
+    expect(html).toContain(totalPlayCountStatLabel)
+    expect(html).not.toContain('公開済')
+    expect(html).not.toContain('処理中')
+    expect(html).not.toContain('ストレージ')
+    expect(html).not.toContain('12.4 GB')
+    expect(html).not.toContain('128')
+    expect(statValues(html)).toEqual([
+      String(videoListItems.length),
+      String(videoListItems.filter(video => video.status === 'published').length),
+      String(videoListItems.filter(video => video.status !== 'published').length),
+      '0',
+    ])
     expect(html).toContain('最近のアップロード')
     expect(html).toContain('すべて見る')
     expect(html).toContain('製品UIデモ：ダッシュボード操作説明')
@@ -224,6 +238,21 @@ describe('SVCP mock screens', async () => {
     expect(dashboardNav).toContain('nav-item-active')
     expect(dashboardNav).toContain('aria-current="page"')
     expect(videosNav).not.toContain('nav-item-active')
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.header\{[^}]*padding:20px32px/)
+    expect(css).toMatch(/\.header\{[^}]*height:77px/)
+    expect(css).toMatch(/\.header-actions\{[^}]*gap:16px/)
+    // Figma のアップロードボタンは 168×37。CJK ではみ出さない内容幅にする
+    expect(css).toMatch(/\.header-upload\{[^}]*min-width:168px/)
+    expect(css).toMatch(/\.header-upload\{[^}]*height:37px/)
+    expect(css).toMatch(/\.header-upload\{[^}]*white-space:nowrap/)
+    expect(css).toMatch(/\.stats-row\{[^}]*gap:20px/)
+    expect(css).toMatch(/\.stat-card\{[^}]*height:107px/)
+    expect(css).toMatch(/\.stat-card\{[^}]*padding:24px/)
+    expect(css).toMatch(/\.stat-card\{[^}]*gap:16px/)
+    expect(css).toMatch(/\.icon-container\{[^}]*width:48px/)
+    expect(css).toMatch(/\.icon-container\{[^}]*height:48px/)
   })
 
   it('renders the video list from mock data with video-list nav active', async () => {

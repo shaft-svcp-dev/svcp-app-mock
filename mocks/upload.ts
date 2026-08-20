@@ -1,3 +1,4 @@
+import { videoStatusLabel } from './dashboard'
 import { videoListItems } from './videos'
 
 /**
@@ -26,7 +27,7 @@ export const conversionPipelineTitle = '変換パイプライン進捗状況'
 export const conversionProgressLabel = '適応ビットレート動画を生成しています'
 export const conversionProgressPercent = 72
 export const conversionPipelineNote
-  = 'アップロードした動画は、自動的に複数ビットレートへ変換され、完了後はHLS形式で配信できます。処理中は動画一覧のステータスが処理中と表示されます。'
+  = `アップロードした動画は、自動的に複数ビットレートへ変換され、完了後はHLS形式で配信できます。変換中は動画一覧のステータスが${videoStatusLabel.processing}と表示されます。`
 
 export const conversionSteps: readonly ConversionStep[] = [
   { id: 'upload', label: 'アップロード', status: 'complete' },

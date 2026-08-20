@@ -49,11 +49,53 @@ export const uploadButtonLabel = '動画をアップロード'
 export const logoutButtonLabel = 'ログアウト'
 export const recentSectionTitle = '最近のアップロード'
 export const viewAllLabel = 'すべて見る'
+export const totalVideosStatLabel = '総動画数'
+export const totalPlayCountStatLabel = '総再生回数'
 
 export const videoStatusLabel: Record<VideoStatus, string> = {
-  published: '公開済',
-  processing: '処理中',
+  published: '公開中',
+  processing: '非公開中',
   draft: '下書き',
+}
+
+export function buildDashboardStats(
+  videos: readonly { status: VideoStatus }[],
+): DashboardStat[] {
+  const publishedCount = videos.filter(video => video.status === 'published').length
+  // 公開中／非公開中は対になる件数。下書きも公開前なので非公開中に含める
+  const unpublishedCount = videos.filter(video => video.status !== 'published').length
+
+  return [
+    {
+      id: 'total-videos',
+      label: totalVideosStatLabel,
+      value: String(videos.length),
+      icon: 'file-video',
+      tone: 'blue',
+    },
+    {
+      id: 'published',
+      label: videoStatusLabel.published,
+      value: String(publishedCount),
+      icon: 'badge-check',
+      tone: 'green',
+    },
+    {
+      id: 'unpublished',
+      label: videoStatusLabel.processing,
+      value: String(unpublishedCount),
+      icon: 'loader',
+      tone: 'amber',
+    },
+    {
+      id: 'play-count',
+      label: totalPlayCountStatLabel,
+      // 動画レコードに再生回数がないため、合計できない
+      value: '0',
+      icon: 'chart-line',
+      tone: 'blue',
+    },
+  ]
 }
 
 /**
@@ -71,13 +113,6 @@ export const dashboardNavItems: readonly DashboardNavItem[] = [
   { id: 'video-list', label: '動画一覧', icon: 'video', to: '/videos' },
   { id: 'upload', label: 'アップロード', icon: 'cloud-upload', to: '/upload' },
   { id: 'settings', label: '設定', icon: 'sliders-horizontal', to: '/settings' },
-]
-
-export const dashboardStats: readonly DashboardStat[] = [
-  { id: 'total-videos', label: '総動画数', value: '128', icon: 'file-video', tone: 'blue' },
-  { id: 'published', label: '公開済', value: '42', icon: 'badge-check', tone: 'green' },
-  { id: 'processing', label: '処理中', value: '3', icon: 'loader', tone: 'amber' },
-  { id: 'storage', label: 'ストレージ', value: '12.4 GB', icon: 'chart-line', tone: 'blue' },
 ]
 
 export const recentUploads: readonly RecentUpload[] = [
