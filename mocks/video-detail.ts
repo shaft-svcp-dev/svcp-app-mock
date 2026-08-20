@@ -12,6 +12,8 @@ export const visibilitySectionTitle = '公開設定'
 export const publishToggleLabel = '動画を公開する'
 export const streamUrlSectionTitle = 'ストリームURL'
 export const copyButtonLabel = 'コピー'
+// トースト用の共通部品は他画面に無い。成功は既存コピーボタンの文言差し替えで伝える
+export const copySuccessLabel = 'コピーしました'
 export const metadataSectionTitle = 'メタデータ（読み取り専用）'
 // public/video に置いたモック動画。ファイル名の日本語と①を維持する
 export const videoPlaybackSrc = '/video/テスト用動画①.mp4'

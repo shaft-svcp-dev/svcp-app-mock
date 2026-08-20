@@ -5,7 +5,8 @@
 .filter-row {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 16px;
   width: 100%;
 }
@@ -44,6 +45,7 @@
 .btn-outline {
   display: flex;
   flex-direction: row;
+  flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
   padding: 10px 16px;
@@ -55,16 +57,21 @@
   font-weight: 600;
   font-size: 14px;
   line-height: 17px;
+  white-space: nowrap;
 }
 
 .status-filter {
-  width: 174px;
+  /* Figma 幅では「すべてのステータス」が収まらない。内容幅で1行表示する */
+  width: auto;
+  min-width: 174px;
   height: 37px;
   flex: none;
+  white-space: nowrap;
 }
 
 .filter-select {
-  width: 118px;
+  width: auto;
+  min-width: 118px;
   height: 17px;
   padding: 0;
   margin: 0;
@@ -76,6 +83,7 @@
   line-height: 17px;
   cursor: pointer;
   appearance: none;
+  white-space: nowrap;
 }
 
 .filter-select:focus {
@@ -83,13 +91,16 @@
 }
 
 .sort-button {
-  width: 162px;
+  /* Figma 幅では「アップロード日時」が2行になる。内容幅で1行表示する */
+  width: auto;
+  min-width: 162px;
   height: 37px;
   flex: none;
+  white-space: nowrap;
 }
 
 .sort-button-label {
-  width: 106px;
+  white-space: nowrap;
   text-align: left;
 }
 

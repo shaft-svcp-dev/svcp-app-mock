@@ -4,6 +4,11 @@ const commonComponents = import.meta.glob('../components/common/*.vue')
 const dashboardComponents = import.meta.glob('../components/dashboard/*.vue')
 const videoListComponents = import.meta.glob('../components/video-list/*.vue')
 const videoDetailComponents = import.meta.glob('../components/video-detail/*.vue')
+const videoDetailSources = import.meta.glob('../components/video-detail/*.vue', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
 const rootComponents = import.meta.glob('../components/*.vue')
 const layouts = import.meta.glob('../layouts/*.vue')
 const videoPages = import.meta.glob('../pages/videos/*.vue', {
@@ -50,6 +55,14 @@ describe('component directories', () => {
       'Player.vue',
       'SidePane.vue',
     ])
+  })
+
+  it('copies the existing streamUrl and exposes copy success feedback in the side pane', () => {
+    const source = Object.entries(videoDetailSources).find(([path]) => path.includes('SidePane'))?.[1]
+    expect(source).toBeDefined()
+    expect(source).toContain('navigator.clipboard.writeText(props.video.streamUrl)')
+    expect(source).toContain('copySuccessLabel')
+    expect(source).toContain('copied')
   })
 
   it('imports video-detail components from the dynamic detail page', () => {

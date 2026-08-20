@@ -16,6 +16,7 @@ import {
 import {
   cancelButtonLabel,
   copyButtonLabel,
+  copySuccessLabel,
   descriptionFieldLabel,
   metadataSectionTitle,
   metadataRowLabels,
@@ -97,6 +98,17 @@ describe('SVCP mock screens', async () => {
       expect(html).toContain(option.label)
     }
 
+    const listCss = (await stylesheetText(html)).replace(/\s+/g, '')
+    // 固定幅だと「すべてのステータス」「アップロード日時」が2行・見切れになる
+    expect(listCss).toMatch(/\.status-filter\{[^}]*white-space:nowrap/)
+    expect(listCss).toMatch(/\.status-filter\{[^}]*width:auto/)
+    expect(listCss).toMatch(/\.filter-select\{[^}]*white-space:nowrap/)
+    expect(listCss).toMatch(/\.filter-select\{[^}]*width:auto/)
+    expect(listCss).toMatch(/\.sort-button\{[^}]*white-space:nowrap/)
+    expect(listCss).toMatch(/\.sort-button\{[^}]*width:auto/)
+    expect(listCss).toMatch(/\.sort-button-label\{[^}]*white-space:nowrap/)
+    expect(listCss).not.toMatch(/\.sort-button-label\{[^}]*width:106px/)
+
     for (const column of videoTableColumns) {
       expect(html).toContain(column.label)
     }
@@ -133,6 +145,7 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(publishToggleLabel)
     expect(html).toContain(streamUrlSectionTitle)
     expect(html).toContain(copyButtonLabel)
+    expect(copySuccessLabel).toBe('コピーしました')
     expect(html).toContain(metadataSectionTitle)
 
     for (const label of metadataRowLabels) {
@@ -145,7 +158,7 @@ describe('SVCP mock screens', async () => {
     )
     expect(html).toMatch(
       new RegExp(
-        `<span[^>]*class="m3u8-url"[^>]*>\\s*${escapeRegExp(video.streamUrl)}\\s*</span>\\s*<button[^>]*class="copy-btn"`,
+        `<span[^>]*class="m3u8-url"[^>]*>\\s*${escapeRegExp(video.streamUrl)}\\s*</span>\\s*<button[^>]*class="copy-btn"[^>]*aria-live="polite"`,
       ),
     )
     expect(html).toContain(video.duration)
@@ -190,5 +203,10 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.screen-video-detail\.page-body\{[^}]*min-width:0/)
     expect(css).toMatch(/\.screen-video-detail\.main-content\{[^}]*overflow-x:visible/)
     expect(css).toMatch(/\.right-pane\{[^}]*min-width:380px/)
+    // 固定幅だと「キャンセル」「変更を保存」が2行・見切れになる
+    expect(css).toMatch(/\.header-cancel,.header-save\{[^}]*width:auto/)
+    expect(css).toMatch(/\.header-cancel,.header-save\{[^}]*white-space:nowrap/)
+    expect(css).toMatch(/\.copy-btn\{[^}]*width:auto/)
+    expect(css).toMatch(/\.copy-btn\{[^}]*white-space:nowrap/)
   })
 })

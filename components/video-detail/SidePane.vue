@@ -3,6 +3,7 @@ import type { VideoListItem } from '~/mocks/videos'
 import { videoStatusLabel } from '~/mocks/dashboard'
 import {
   copyButtonLabel,
+  copySuccessLabel,
   metadataRowLabels,
   metadataSectionTitle,
   publishToggleLabel,
@@ -17,9 +18,27 @@ const props = defineProps<{
 const [statusRowLabel, durationRowLabel, uploadedAtRowLabel, fileSizeRowLabel]
   = metadataRowLabels
 
-function copyStreamUrl() {
-  void navigator.clipboard.writeText(props.video.streamUrl)
+const copied = ref(false)
+let copiedResetTimer: ReturnType<typeof setTimeout> | undefined
+
+async function copyStreamUrl() {
+  await navigator.clipboard.writeText(props.video.streamUrl)
+  copied.value = true
+  if (copiedResetTimer !== undefined) {
+    clearTimeout(copiedResetTimer)
+  }
+  // 成功表示に気づける長さ。短すぎると「コピー」のままに見える
+  copiedResetTimer = setTimeout(() => {
+    copied.value = false
+    copiedResetTimer = undefined
+  }, 2000)
 }
+
+onUnmounted(() => {
+  if (copiedResetTimer !== undefined) {
+    clearTimeout(copiedResetTimer)
+  }
+})
 </script>
 
 <template>
@@ -48,9 +67,14 @@ function copyStreamUrl() {
       </h2>
       <div class="url-container">
         <span class="m3u8-url">{{ video.streamUrl }}</span>
-        <button class="copy-btn" type="button" @click="copyStreamUrl">
-          <AppIcon name="file-stack" :size="14" />
-          <span class="copy-label">{{ copyButtonLabel }}</span>
+        <button
+          class="copy-btn"
+          type="button"
+          aria-live="polite"
+          @click="copyStreamUrl"
+        >
+          <AppIcon :name="copied ? 'check' : 'file-stack'" :size="14" />
+          <span class="copy-label">{{ copied ? copySuccessLabel : copyButtonLabel }}</span>
         </button>
       </div>
     </section>
