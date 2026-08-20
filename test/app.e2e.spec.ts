@@ -9,7 +9,8 @@ describe('Dashboard', async () => {
   it('renders the dashboard chrome, stats, and recent uploads from mock data', async () => {
     const html = await $fetch('/')
 
-    expect(html).toContain('VideoHub')
+    expect(html).toContain('SVCP')
+    expect(html).not.toContain('VideoHub')
     expect(html).toContain('ダッシュボード')
     expect(html).toContain('動画一覧')
     expect(html).toContain('アップロード')

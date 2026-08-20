@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/dashboard.css'],
   app: {
     head: {
-      title: 'ダッシュボード | VideoHub',
+      title: 'ダッシュボード | SVCP',
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },

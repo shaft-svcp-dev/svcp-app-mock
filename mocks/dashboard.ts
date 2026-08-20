@@ -43,7 +43,7 @@ export interface RecentUpload {
   thumbnailAlt: string
 }
 
-export const productName = 'VideoHub'
+export const productName = 'SVCP'
 export const dashboardTitle = 'ダッシュボード'
 export const uploadButtonLabel = '動画をアップロード'
 export const recentSectionTitle = '最近のアップロード'
