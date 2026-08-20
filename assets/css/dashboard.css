@@ -19,7 +19,8 @@ body {
 
 .screen-dashboard,
 .screen-video-list,
-.screen-video-detail {
+.screen-video-detail,
+.screen-upload {
   display: flex;
   flex-direction: row;
   align-items: flex-start;

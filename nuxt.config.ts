@@ -3,7 +3,12 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
-  css: ['~/assets/css/dashboard.css', '~/assets/css/video-list.css', '~/assets/css/video-detail.css'],
+  css: [
+    '~/assets/css/dashboard.css',
+    '~/assets/css/video-list.css',
+    '~/assets/css/video-detail.css',
+    '~/assets/css/upload.css',
+  ],
   components: [
     {
       path: '~/components/common',
@@ -22,6 +27,10 @@ export default defineNuxtConfig({
     {
       path: '~/components/video-detail',
       prefix: 'VideoDetail',
+    },
+    {
+      path: '~/components/upload',
+      prefix: 'Upload',
     },
   ],
   app: {

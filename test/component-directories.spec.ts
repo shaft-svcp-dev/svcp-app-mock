@@ -9,6 +9,7 @@ const videoDetailSources = import.meta.glob('../components/video-detail/*.vue', 
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
+const uploadComponents = import.meta.glob('../components/upload/*.vue')
 const rootComponents = import.meta.glob('../components/*.vue')
 const layouts = import.meta.glob('../layouts/*.vue')
 const videoPages = import.meta.glob('../pages/videos/*.vue', {
@@ -54,6 +55,14 @@ describe('component directories', () => {
       'MetaInputs.vue',
       'Player.vue',
       'SidePane.vue',
+    ])
+  })
+
+  it('places upload page components in components/upload', () => {
+    expect(fileNames(uploadComponents).sort()).toEqual([
+      'ConversionPipeline.vue',
+      'DropZone.vue',
+      'FileInfo.vue',
     ])
   })
 

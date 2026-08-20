@@ -1,0 +1,251 @@
+.upload-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 40px;
+  width: 100%;
+  padding: 48px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+}
+
+.drop-zone {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 48px;
+  background: rgba(239, 246, 255, 0.133333);
+  border: 2px dashed #2563eb;
+  border-radius: 12px;
+}
+
+.cloud-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  background: #eff6ff;
+  border-radius: 32px;
+  color: #2563eb;
+  flex: none;
+}
+
+.text-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.drop-title,
+.drop-subtitle {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.drop-title {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 22px;
+  color: #0f172a;
+}
+
+.drop-subtitle {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  color: #94a3b8;
+}
+
+.select-file-btn {
+  /* Figma 幅 130px は CJK 1em 想定。実フォントで見切れないよう内容幅にする */
+  width: auto;
+  min-width: 130px;
+  height: 37px;
+  white-space: nowrap;
+  flex: none;
+}
+
+.conversion-pipeline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  width: 100%;
+}
+
+.stepper-track,
+.stepper-nodes {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.step-circle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  flex: none;
+}
+
+.step-circle-complete {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.step-circle-active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.step-circle-pending {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.step-number {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.step-label {
+  width: 100%;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  color: #475569;
+}
+
+.step-label-active {
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.connector {
+  height: 4px;
+  flex: 1;
+  background: #e2e8f0;
+  border-radius: 2px;
+}
+
+.connector-complete {
+  background: #2563eb;
+}
+
+.progress-bar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.progress-labels {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.progress-left,
+.progress-right {
+  color: #2563eb;
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.progress-left {
+  font-weight: 600;
+}
+
+.progress-right {
+  font-weight: 700;
+}
+
+.bar-track {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 10px;
+  background: #2563eb;
+  border-radius: 5px;
+}
+
+.pipeline-note {
+  margin: 0;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #475569;
+}
+
+.file-info-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #475569;
+}
+
+.file-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.file-name {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  color: #0f172a;
+}
+
+.file-metadata {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: #475569;
+}

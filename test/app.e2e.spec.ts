@@ -14,6 +14,17 @@ import {
   videoTableColumns,
 } from '../mocks/videos'
 import {
+  conversionPipelineNote,
+  conversionPipelineTitle,
+  conversionProgressLabel,
+  conversionProgressPercent,
+  conversionSteps,
+  dropZoneSubtitle,
+  dropZoneTitle,
+  selectFileButtonLabel,
+  uploadingFile,
+} from '../mocks/upload'
+import {
   cancelButtonLabel,
   copyButtonLabel,
   copySuccessLabel,
@@ -208,5 +219,39 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.header-cancel,.header-save\{[^}]*white-space:nowrap/)
     expect(css).toMatch(/\.copy-btn\{[^}]*width:auto/)
     expect(css).toMatch(/\.copy-btn\{[^}]*white-space:nowrap/)
+  })
+
+  it('renders the upload screen from mock data with upload nav active', async () => {
+    const html = await $fetch<string>('/upload')
+
+    expect(html).toContain(uploadButtonLabel)
+    expect(html).toContain(dashboardUser.name)
+    expect(html).toContain(dashboardUser.role)
+    expect(html).toContain(dropZoneTitle)
+    expect(html).toContain(dropZoneSubtitle)
+    expect(html).toContain(selectFileButtonLabel)
+    expect(html).toContain(conversionPipelineTitle)
+    expect(html).toContain(conversionProgressLabel)
+    expect(html).toContain(`${conversionProgressPercent}%`)
+    expect(html).toContain(conversionPipelineNote)
+    expect(html).toContain(uploadingFile.filename)
+    expect(html).toContain(uploadingFile.metadata)
+
+    for (const step of conversionSteps) {
+      expect(html).toContain(step.label)
+    }
+
+    const dashboardNav = firstAnchorWithHref(html, '/')
+    const videosNav = firstAnchorWithHref(html, '/videos')
+    const uploadNav = firstAnchorWithHref(html, '/upload')
+    expect(uploadNav).toContain('nav-item-active')
+    expect(uploadNav).toContain('aria-current="page"')
+    expect(dashboardNav).not.toContain('nav-item-active')
+    expect(videosNav).not.toContain('nav-item-active')
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.drop-zone\{[^}]*border:2pxdashed#2563eb/)
+    expect(css).toMatch(/\.select-file-btn\{[^}]*white-space:nowrap/)
+    expect(css).toMatch(/\.select-file-btn\{[^}]*width:auto/)
   })
 })

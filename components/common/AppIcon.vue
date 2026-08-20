@@ -15,6 +15,7 @@ export type AppIconName =
   | 'chart-line'
   | 'file-stack'
   | 'check'
+  | 'check-circle'
 
 defineProps<{
   name: AppIconName
@@ -107,6 +108,10 @@ defineProps<{
     </template>
     <template v-else-if="name === 'check'">
       <path d="M20 6 9 17l-5-5" />
+    </template>
+    <template v-else-if="name === 'check-circle'">
+      <circle cx="12" cy="12" r="10" />
+      <path d="m9 12 2 2 4-4" />
     </template>
     <template v-else-if="name === 'file-stack'">
       <path d="M21 7h-3a2 2 0 0 1-2-2V2" />
