@@ -5,10 +5,12 @@
  * タイトルは画面名「新規会員登録」。placeholder に hug 幅が無いため、
  * メール・パスワードは login を再利用し、会社名・氏名は login と同じ英語の入力形式にする。
  * tagline 文字列は CSS に無い。1行枠だが製品用途は login と同一のため複製しない。
+ * ログインへの文字リンクは、ログイン画面の「会員登録はこちら」に対応する。
  */
 import {
   emailFieldLabel,
   emailPlaceholder,
+  loginPath,
   loginTagline,
   passwordFieldLabel,
   passwordPlaceholder,
@@ -24,11 +26,13 @@ export const companyPlaceholder = 'Company Name'
 export const fullNamePlaceholder = 'Your Name'
 export const termsConsentLabel = '利用規約に同意します'
 export const signupButtonLabel = '会員登録'
+export const loginLinkLabel = 'ログインはこちら'
 export const passwordMismatchMessage = 'パスワードが一致しません'
 
 export {
   emailFieldLabel,
   emailPlaceholder,
+  loginPath,
   passwordFieldLabel,
   passwordPlaceholder,
 }

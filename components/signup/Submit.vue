@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { signupButtonLabel } from '~/mocks/signup'
+import { loginLinkLabel, loginPath, signupButtonLabel } from '~/mocks/signup'
 </script>
 
 <template>
@@ -7,5 +7,8 @@ import { signupButtonLabel } from '~/mocks/signup'
     <button class="btn" type="submit">
       <span class="btn-label">{{ signupButtonLabel }}</span>
     </button>
+    <NuxtLink class="login-link" :to="loginPath">
+      {{ loginLinkLabel }}
+    </NuxtLink>
   </div>
 </template>

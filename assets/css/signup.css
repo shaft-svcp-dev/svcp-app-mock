@@ -255,3 +255,11 @@
   font-size: 15px;
   line-height: 18px;
 }
+
+.login-link {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 16px;
+  color: #2563eb;
+  text-decoration: none;
+}

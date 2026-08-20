@@ -50,6 +50,7 @@ import {
   loginTagline,
   passwordFieldLabel,
   passwordPlaceholder,
+  loginPath,
   signupLinkLabel,
   signupPath,
   signupPromptLabel,
@@ -59,6 +60,7 @@ import {
   companyPlaceholder,
   fullNameFieldLabel,
   fullNamePlaceholder,
+  loginLinkLabel,
   passwordConfirmFieldLabel,
   requiredFieldLabel,
   signupButtonLabel,
@@ -146,6 +148,8 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(passwordPlaceholder)
     expect(html).toContain(termsConsentLabel)
     expect(html).toContain(signupButtonLabel)
+    expect(html).toContain(loginLinkLabel)
+    expect(firstAnchorWithHref(html, loginPath)).toBeDefined()
     expect(html).not.toContain(dashboardUser.name)
     expect(html).not.toContain('メインナビゲーション')
     expect(html).toMatch(/<input[^>]*type="email"/)

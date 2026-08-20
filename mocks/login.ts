@@ -14,6 +14,7 @@ export const loginButtonLabel = 'ログイン'
 export const signupPromptLabel = 'アカウントをお持ちですか？'
 export const signupLinkLabel = '会員登録はこちら'
 export const signupPath = '/signup'
+export const loginPath = '/login'
 
 // 資格情報は持たない。ログイン操作の有無だけを Cookie で表す
 export const authCookieName = 'svcp-authenticated'
