@@ -6,6 +6,9 @@ export type AppIconName =
   | 'cloud-upload'
   | 'sliders-horizontal'
   | 'plus'
+  | 'search'
+  | 'chevron-down'
+  | 'sort-desc'
   | 'file-video'
   | 'badge-check'
   | 'loader'
@@ -62,6 +65,20 @@ defineProps<{
     <template v-else-if="name === 'plus'">
       <path d="M5 12h14" />
       <path d="M12 5v14" />
+    </template>
+    <template v-else-if="name === 'search'">
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </template>
+    <template v-else-if="name === 'chevron-down'">
+      <path d="m6 9 6 6 6-6" />
+    </template>
+    <template v-else-if="name === 'sort-desc'">
+      <path d="m3 16 4 4 4-4" />
+      <path d="M7 20V4" />
+      <path d="M11 4h10" />
+      <path d="M11 8h7" />
+      <path d="M11 12h4" />
     </template>
     <template v-else-if="name === 'file-video'">
       <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />

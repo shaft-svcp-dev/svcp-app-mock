@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
-  css: ['~/assets/css/dashboard.css'],
+  css: ['~/assets/css/dashboard.css', '~/assets/css/video-list.css'],
   components: [
     {
       path: '~/components/common',
@@ -14,6 +14,10 @@ export default defineNuxtConfig({
       path: '~/components/dashboard',
       // ページ専用コンポーネントは <DashboardHeader> のようにページ名を接頭辞にする
       prefix: 'Dashboard',
+    },
+    {
+      path: '~/components/video-list',
+      prefix: 'VideoList',
     },
   ],
   app: {

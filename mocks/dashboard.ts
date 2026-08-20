@@ -8,7 +8,7 @@ export type StatIconName = 'file-video' | 'badge-check' | 'loader' | 'chart-line
 
 export type StatTone = 'blue' | 'green' | 'amber'
 
-export type VideoStatus = 'published' | 'processing'
+export type VideoStatus = 'published' | 'processing' | 'draft'
 
 export interface DashboardNavItem {
   id: string
@@ -52,6 +52,7 @@ export const viewAllLabel = 'すべて見る'
 export const videoStatusLabel: Record<VideoStatus, string> = {
   published: '公開済',
   processing: '処理中',
+  draft: '下書き',
 }
 
 /**

@@ -17,7 +17,8 @@ body {
   background: #f8fafc;
 }
 
-.screen-dashboard {
+.screen-dashboard,
+.screen-video-list {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -398,6 +399,10 @@ body {
   background: #fef3c7;
 }
 
+.badge-draft {
+  background: #e2e8f0;
+}
+
 .badge-label {
   font-weight: 600;
   font-size: 12px;
@@ -410,4 +415,8 @@ body {
 
 .badge-processing .badge-label {
   color: #f59e0b;
+}
+
+.badge-draft .badge-label {
+  color: #475569;
 }

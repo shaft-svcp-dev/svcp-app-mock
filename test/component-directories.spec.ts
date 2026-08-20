@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 const commonComponents = import.meta.glob('../components/common/*.vue')
 const dashboardComponents = import.meta.glob('../components/dashboard/*.vue')
+const videoListComponents = import.meta.glob('../components/video-list/*.vue')
 const rootComponents = import.meta.glob('../components/*.vue')
 
 function fileNames(modules: Record<string, unknown>): string[] {
@@ -19,6 +20,14 @@ describe('component directories', () => {
       'Header.vue',
       'StatCard.vue',
       'VideoRow.vue',
+    ])
+  })
+
+  it('places video list page components in components/video-list', () => {
+    expect(fileNames(videoListComponents).sort()).toEqual([
+      'FilterRow.vue',
+      'Header.vue',
+      'Table.vue',
     ])
   })
 })
