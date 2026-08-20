@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// ページ名 Upload と prefix Upload* が重なり、自動解決がページ変換に乗らない
+import UploadConversionPipeline from '~/components/upload/ConversionPipeline.vue'
+import UploadDropZone from '~/components/upload/DropZone.vue'
+import UploadFileInfo from '~/components/upload/FileInfo.vue'
 import { productName, uploadButtonLabel } from '~/mocks/dashboard'
 import { uploadingFile } from '~/mocks/upload'
 

@@ -17,6 +17,11 @@ const videoPages = import.meta.glob('../pages/videos/*.vue', {
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
+const uploadPage = import.meta.glob('../pages/upload.vue', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
 
 function fileNames(modules: Record<string, unknown>): string[] {
   return Object.keys(modules).map(path => path.split('/').at(-1) ?? path)
@@ -81,5 +86,14 @@ describe('component directories', () => {
     expect(source).toContain("~/components/video-detail/Player.vue")
     expect(source).toContain("~/components/video-detail/MetaInputs.vue")
     expect(source).toContain("~/components/video-detail/SidePane.vue")
+  })
+
+  it('imports upload components from the upload page', () => {
+    // ページ名 Upload と prefix Upload* が重なると自動解決が乗らず、SSRとクライアントが食い違う
+    const source = Object.values(uploadPage)[0]
+    expect(source).toBeDefined()
+    expect(source).toContain("~/components/upload/DropZone.vue")
+    expect(source).toContain("~/components/upload/ConversionPipeline.vue")
+    expect(source).toContain("~/components/upload/FileInfo.vue")
   })
 })
