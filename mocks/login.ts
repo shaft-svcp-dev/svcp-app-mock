@@ -20,6 +20,10 @@ export const forgotPasswordPromptLabel = 'パスワードをお忘れの場合�
 export const forgotPasswordLinkLabel = 'こちら'
 export const passwordResetPath = '/password-reset'
 
-// 資格情報は持たない。ログイン操作の有無だけを Cookie で表す
-export const authCookieName = 'svcp-authenticated'
-export const authCookieValue = '1'
+// 資格情報は持たない。ログイン操作の有無だけを localStorage で表す
+export const authStorageKey = 'svcp-authenticated'
+export const authStorageValue = '1'
+
+export function isAuthenticated(value: string | null | undefined): boolean {
+  return value === authStorageValue
+}

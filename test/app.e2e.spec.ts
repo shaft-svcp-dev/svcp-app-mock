@@ -43,10 +43,7 @@ import {
   cancelButtonLabel,
   copyButtonLabel,
   copySuccessLabel,
-  deleteButtonLabel,
-  deleteConfirmCancelLabel,
   deleteConfirmMessage,
-  deleteConfirmOkLabel,
   deleteConfirmTitle,
   descriptionFieldLabel,
   metadataSectionTitle,
@@ -71,10 +68,10 @@ import {
   visibilitySectionTitle,
 } from '../mocks/video-detail'
 import {
-  authCookieName,
-  authCookieValue,
+  authStorageValue,
   emailFieldLabel,
   emailPlaceholder,
+  isAuthenticated,
   loginButtonLabel,
   loginTagline,
   passwordFieldLabel,
@@ -122,7 +119,6 @@ import {
   freeMemberLabel,
   isPaidMembership,
   maskEmail,
-  membershipCookieName,
   membershipSectionTitle,
   paidMemberLabel,
   paidMembershipValue,
@@ -151,11 +147,14 @@ async function stylesheetText(html: string): Promise<string> {
   return [...inline, ...linked].join('\n')
 }
 
-function authenticatedFetch(path: string, extraCookies: Record<string, string> = {}) {
-  const cookie = [
-    `${authCookieName}=${authCookieValue}`,
-    ...Object.entries(extraCookies).map(([name, value]) => `${name}=${encodeURIComponent(value)}`),
-  ].join('; ')
+function fetchPage(path: string, extraCookies: Record<string, string> = {}) {
+  const cookie = Object.entries(extraCookies)
+    .map(([name, value]) => `${name}=${encodeURIComponent(value)}`)
+    .join('; ')
+
+  if (!cookie) {
+    return $fetch<string>(path)
+  }
 
   return $fetch<string>(path, {
     headers: {
@@ -320,37 +319,28 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.screen-password-reset-sent\{[^}]*background:#f8fafc/)
   })
 
-  it('sends unauthenticated visitors from the dashboard to the login screen', async () => {
-    const html = await $fetch<string>('/')
+  it('renders public auth screens on the server because localStorage is client-only', async () => {
+    expect(isAuthenticated(undefined)).toBe(false)
+    expect(isAuthenticated(authStorageValue)).toBe(true)
 
-    expect(html).toContain(loginButtonLabel)
-    expect(html).toContain(emailFieldLabel)
-    expect(html).not.toContain('総動画数')
-    expect(html).not.toContain(dashboardUser.name)
-  })
+    const dashboardHtml = await $fetch<string>('/')
+    const signupHtml = await $fetch<string>('/signup')
+    const resetHtml = await $fetch<string>(passwordResetPath)
+    const sentHtml = await $fetch<string>(passwordResetSentPath)
+    const settingsHtml = await $fetch<string>(settingsPath)
 
-  it('keeps authenticated visitors on the dashboard instead of the signup screen', async () => {
-    const html = await authenticatedFetch('/signup')
-
-    expect(html).toContain('総動画数')
-    expect(html).toContain(dashboardUser.name)
-    expect(html).not.toContain(signupTitle)
-    expect(html).not.toContain(companyFieldLabel)
-  })
-
-  it('keeps authenticated visitors on the dashboard instead of the password-reset screens', async () => {
-    const resetHtml = await authenticatedFetch(passwordResetPath)
-    const sentHtml = await authenticatedFetch(passwordResetSentPath)
-
-    expect(resetHtml).toContain('総動画数')
-    expect(resetHtml).toContain(dashboardUser.name)
-    expect(resetHtml).not.toContain(passwordResetButtonLabel)
-    expect(sentHtml).toContain('総動画数')
-    expect(sentHtml).not.toContain(passwordResetSentTitle)
+    expect(dashboardHtml).toContain('総動画数')
+    expect(dashboardHtml).toContain(dashboardUser.name)
+    expect(signupHtml).toContain(signupTitle)
+    expect(signupHtml).toContain(companyFieldLabel)
+    expect(resetHtml).toContain(passwordResetButtonLabel)
+    expect(sentHtml).toContain(passwordResetSentTitle)
+    expect(settingsHtml).toContain(accountSectionTitle)
+    expect(settingsHtml).toContain(deleteAccountButtonLabel)
   })
 
   it('renders the dashboard chrome, stats, and recent uploads from mock data', async () => {
-    const html = await authenticatedFetch('/')
+    const html = await fetchPage('/')
 
     expect(html).toContain('SVCP')
     expect(html).not.toContain('VideoHub')
@@ -427,7 +417,7 @@ describe('SVCP mock screens', async () => {
   })
 
   it('links each recent dashboard upload to its video detail page', async () => {
-    const html = await authenticatedFetch('/')
+    const html = await fetchPage('/')
 
     for (const upload of recentUploads) {
       // 詳細画面は videoListItems の id で引く。同じ動画なら id を揃える
@@ -449,7 +439,7 @@ describe('SVCP mock screens', async () => {
   })
 
   it('renders the video list from mock data with video-list nav active', async () => {
-    const html = await authenticatedFetch('/videos')
+    const html = await fetchPage('/videos')
 
     expect(html).toContain(videoListTitle)
     expect(html).toContain(dashboardUser.name)
@@ -511,8 +501,8 @@ describe('SVCP mock screens', async () => {
   })
 
   it('filters the video list by status query from dashboard stat cards', async () => {
-    const publishedHtml = await authenticatedFetch('/videos?status=published')
-    const unpublishedHtml = await authenticatedFetch('/videos?status=unpublished')
+    const publishedHtml = await fetchPage('/videos?status=published')
+    const unpublishedHtml = await fetchPage('/videos?status=unpublished')
     const publishedVideos = videoListItems.filter(video => video.status === 'published')
     const unpublishedVideos = videoListItems.filter(video => video.status === 'unpublished')
 
@@ -532,7 +522,7 @@ describe('SVCP mock screens', async () => {
 
   it('renders the video detail from list mock data with video-list nav active', async () => {
     const video = videoListItems[0]
-    const html = await authenticatedFetch(`/videos/${video.id}`)
+    const html = await fetchPage(`/videos/${video.id}`)
 
     expect(html).toContain(videoDetailTitle)
     expect(html).toContain(cancelButtonLabel)
@@ -569,7 +559,7 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(dashboardUser.role)
 
     const otherVideo = videoListItems[1]
-    const otherHtml = await authenticatedFetch(`/videos/${otherVideo.id}`)
+    const otherHtml = await fetchPage(`/videos/${otherVideo.id}`)
     expect(otherHtml).toMatch(
       new RegExp(`<textarea[^>]*>\\s*${escapeRegExp(otherVideo.description)}\\s*</textarea>`),
     )
@@ -610,7 +600,7 @@ describe('SVCP mock screens', async () => {
 
   it('hides video delete controls for free members', async () => {
     const video = videoListItems[0]
-    const html = await authenticatedFetch(`/videos/${video.id}`)
+    const html = await fetchPage(`/videos/${video.id}`)
 
     expect(isPaidMembership(undefined)).toBe(false)
     expect(elementOpeningTag(html, 'header-delete')).toBeUndefined()
@@ -618,42 +608,14 @@ describe('SVCP mock screens', async () => {
     expect(html).not.toContain(deleteConfirmTitle)
   })
 
-  it('renders the video detail delete confirmation dialog and publish toggle from mock data', async () => {
+  it('renders the video detail publish toggle from mock data', async () => {
     const publishedVideo = videoListItems[0]
     const unpublishedVideo = videoListItems.find(video => video.status === 'unpublished')
     expect(publishedVideo.status).toBe('published')
     expect(unpublishedVideo).toBeDefined()
 
-    const paid = { [membershipCookieName]: paidMembershipValue }
-    const html = await authenticatedFetch(`/videos/${publishedVideo.id}`, paid)
-    const unpublishedHtml = await authenticatedFetch(`/videos/${unpublishedVideo!.id}`, paid)
-
-    const headerActions = headerActionsHtml(html)
-    expect(headerActions).toContain(deleteButtonLabel)
-    expect(headerActions).toMatch(
-      new RegExp(`<button[^>]*>[\\s\\S]*?${escapeRegExp(deleteButtonLabel)}`),
-    )
-
-    expect(html).toMatch(/role="dialog"/)
-    expect(html).toContain(deleteConfirmTitle)
-    expect(html).toContain(deleteConfirmMessage)
-    expect(html).toContain(deleteConfirmOkLabel)
-    expect(html).toContain(deleteConfirmCancelLabel)
-
-    const overlayTag = elementOpeningTag(html, 'delete-dialog-overlay')
-    expect(overlayTag).toBeDefined()
-    expect(overlayTag).toMatch(/\bhidden\b/)
-
-    const dialog = dialogHtml(html)
-    expect(dialog).toContain(deleteConfirmTitle)
-    expect(dialog).toContain(deleteConfirmOkLabel)
-    expect(dialog).toContain(deleteConfirmCancelLabel)
-    expect(dialog).toMatch(
-      new RegExp(`<button[^>]*>[\\s\\S]*?${escapeRegExp(deleteConfirmCancelLabel)}`),
-    )
-    expect(dialog).toMatch(
-      new RegExp(`<button[^>]*>[\\s\\S]*?${escapeRegExp(deleteConfirmOkLabel)}`),
-    )
+    const html = await fetchPage(`/videos/${publishedVideo.id}`)
+    const unpublishedHtml = await fetchPage(`/videos/${unpublishedVideo!.id}`)
 
     const publishedSwitch = switchButtonOpeningTag(html)
     expect(publishedSwitch).toBeDefined()
@@ -678,9 +640,9 @@ describe('SVCP mock screens', async () => {
 
   it('renders thumbnail and subtitle settings from the video record without placeholder tracks', async () => {
     const video = videoListItems[0]
-    const html = await authenticatedFetch(`/videos/${video.id}`)
+    const html = await fetchPage(`/videos/${video.id}`)
     const otherVideo = videoListItems[1]
-    const otherHtml = await authenticatedFetch(`/videos/${otherVideo.id}`)
+    const otherHtml = await fetchPage(`/videos/${otherVideo.id}`)
 
     expect(html).toContain(thumbnailSectionTitle)
     expect(html).toContain(thumbnailUploadLabel)
@@ -732,7 +694,7 @@ describe('SVCP mock screens', async () => {
   })
 
   it('renders the upload screen from mock data with upload nav active', async () => {
-    const html = await authenticatedFetch('/upload')
+    const html = await fetchPage('/upload')
 
     expect(html).toContain(uploadButtonLabel)
     expect(html).toContain(dashboardUser.name)
@@ -782,30 +744,8 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.select-file-btn\{[^}]*width:auto/)
   })
 
-  it('lets paid members select multiple videos on the upload screen', async () => {
-    const html = await authenticatedFetch('/upload', {
-      [membershipCookieName]: paidMembershipValue,
-    })
-
-    expect(html).toContain(paidUploadMultipleNote)
-    expect(html).not.toContain(freeUploadLimitNote)
-
-    const fileInput = html.match(/<input\b[^>]*type="file"[^>]*>/)?.[0]
-    expect(fileInput).toBeDefined()
-    expect(fileInput).toMatch(/\bmultiple\b/)
-  })
-
-  it('sends unauthenticated visitors from settings to the login screen', async () => {
-    const html = await $fetch<string>(settingsPath)
-
-    expect(html).toContain(loginButtonLabel)
-    expect(html).toContain(emailFieldLabel)
-    expect(html).not.toContain(accountSectionTitle)
-    expect(html).not.toContain(deleteAccountButtonLabel)
-  })
-
   it('renders the settings screen from mock account data with settings nav active', async () => {
-    const html = await authenticatedFetch(settingsPath)
+    const html = await fetchPage(settingsPath)
     const accountInfo = accountInfoHtml(html)
     const membershipStatus = membershipStatusHtml(html)
     const maskedEmail = maskEmail(registeredAccount.email)
@@ -878,28 +818,14 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.header-delete\{[^}]*cursor:pointer/)
   })
 
-  it('shows paid membership status and hides the payment form', async () => {
-    const html = await authenticatedFetch(settingsPath, {
-      [membershipCookieName]: paidMembershipValue,
-    })
-    const membershipStatus = membershipStatusHtml(html)
-
-    expect(membershipStatus).toContain(paidMemberLabel)
-    expect(membershipStatus).not.toContain(freeMemberLabel)
-    expect(html).not.toContain(payButtonLabel)
-    expect(html).not.toContain(cardNumberFieldLabel)
-    expect(html).toContain(membershipSectionTitle)
-  })
-
-  it('hides deleted videos from the list for paid members', async () => {
+  it('hides deleted videos from the list', async () => {
     const video = videoListItems[0]
     expect(parseDeletedVideoIds(undefined)).toEqual([])
     expect(parseDeletedVideoIds(video.id)).toEqual([video.id])
     expect(excludeDeletedVideos(videoListItems, [video.id]).some(item => item.id === video.id))
       .toBe(false)
 
-    const html = await authenticatedFetch('/videos', {
-      [membershipCookieName]: paidMembershipValue,
+    const html = await fetchPage('/videos', {
       [deletedVideoIdsCookieName]: video.id,
     })
 
@@ -908,7 +834,7 @@ describe('SVCP mock screens', async () => {
   })
 
   it('renders the settings delete confirmation dialog from mock data', async () => {
-    const html = await authenticatedFetch(settingsPath)
+    const html = await fetchPage(settingsPath)
 
     expect(html).toMatch(/role="dialog"/)
     expect(html).toContain(deleteAccountConfirmTitle)

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { logoutButtonLabel, uploadButtonLabel } from '~/mocks/dashboard'
 
-const authenticated = useAuthCookie()
+const authenticated = useAuthStorage()
 
 async function onLogout() {
   authenticated.value = null

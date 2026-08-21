@@ -5,7 +5,7 @@ import SignupFormFields from '~/components/signup/FormFields.vue'
 import SignupSubmit from '~/components/signup/Submit.vue'
 import SignupTermsConsent from '~/components/signup/TermsConsent.vue'
 import { productName } from '~/mocks/dashboard'
-import { authCookieValue } from '~/mocks/login'
+import { authStorageValue } from '~/mocks/login'
 import { signupTitle } from '~/mocks/signup'
 
 definePageMeta({
@@ -23,11 +23,11 @@ const password = ref('')
 const passwordConfirm = ref('')
 // Figma の checkbox-box は選択済み表示。初期値だけ合わせ、保存はしない
 const termsAgreed = ref(true)
-const authenticated = useAuthCookie()
+const authenticated = useAuthStorage()
 
 async function onSubmit() {
   // API 未接続のため入力値は保存せず、登録操作の有無だけを残す
-  authenticated.value = authCookieValue
+  authenticated.value = authStorageValue
   await navigateTo('/')
 }
 </script>

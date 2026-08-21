@@ -44,8 +44,8 @@ export const payButtonLabel = '支払いをする'
 export const paymentCompleteTitle = '支払いが完了しました'
 export const paymentCompleteConfirmLabel = '確認'
 
-// 認証と同じく画面をまたいで会員種別を共有する。初期は Cookie なし＝無料会員
-export const membershipCookieName = 'svcp-membership'
+// 認証と同じく画面をまたいで会員種別を共有する。初期は localStorage なし＝無料会員
+export const membershipStorageKey = 'svcp-membership'
 export const paidMembershipValue = 'paid'
 
 export function isPaidMembership(value: string | null | undefined): boolean {

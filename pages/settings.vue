@@ -22,7 +22,7 @@ useHead({
   title: `${settingsTitle} | ${productName}`,
 })
 
-const authenticated = useAuthCookie()
+const authenticated = useAuthStorage()
 const { isPaid, markPaid } = useMembership()
 const deleteDialogOpen = ref(false)
 const paymentCompleteOpen = ref(false)
@@ -33,7 +33,7 @@ function openDeleteDialog() {
 }
 
 async function confirmDelete() {
-  // モックに削除 API は無い。ログアウトと同じく認証 Cookie を消してログインへ戻す
+  // モックに削除 API は無い。ログアウトと同じく認証状態を消してログインへ戻す
   authenticated.value = null
   await navigateTo(loginPath)
 }

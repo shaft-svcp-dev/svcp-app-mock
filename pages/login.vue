@@ -5,7 +5,7 @@ import LoginFormFields from '~/components/login/FormFields.vue'
 import LoginSubmit from '~/components/login/Submit.vue'
 import { productName } from '~/mocks/dashboard'
 import {
-  authCookieValue,
+  authStorageValue,
   loginTitle,
 } from '~/mocks/login'
 
@@ -19,11 +19,11 @@ useHead({
 
 const email = ref('')
 const password = ref('')
-const authenticated = useAuthCookie()
+const authenticated = useAuthStorage()
 
 async function onSubmit() {
   // API 未接続のため資格情報は検証せず、ログイン操作の有無だけを残す
-  authenticated.value = authCookieValue
+  authenticated.value = authStorageValue
   await navigateTo('/')
 }
 </script>

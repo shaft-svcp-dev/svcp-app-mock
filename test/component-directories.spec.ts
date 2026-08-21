@@ -46,6 +46,16 @@ const settingsPage = import.meta.glob('../pages/settings.vue', {
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
+const composableSources = import.meta.glob('../composables/*.ts', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
+const middlewareSources = import.meta.glob('../middleware/*.ts', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
 
 function fileNames(modules: Record<string, unknown>): string[] {
   return Object.keys(modules).map(path => path.split('/').at(-1) ?? path)
@@ -118,6 +128,15 @@ describe('component directories', () => {
     expect(source).toContain("~/components/video-detail/ThumbnailSettings.vue")
     expect(source).toContain("~/components/video-detail/SubtitleSettings.vue")
     expect(source).toContain('navigateTo(videoListPath)')
+  })
+
+  it('keeps video delete confirmation copy in the detail delete dialog', () => {
+    const source = Object.entries(videoDetailSources).find(([path]) => path.includes('DeleteDialog'))?.[1]
+    expect(source).toBeDefined()
+    expect(source).toContain('deleteConfirmTitle')
+    expect(source).toContain('deleteConfirmMessage')
+    expect(source).toContain('deleteConfirmOkLabel')
+    expect(source).toContain('deleteConfirmCancelLabel')
   })
 
   it('keeps thumbnail and subtitle settings as local UI state on the detail page', () => {
@@ -263,5 +282,57 @@ describe('component directories', () => {
     expect(uploadSource).toContain('isPaid')
     expect(uploadSource).toContain('limitSelectedFiles')
     expect(uploadSource).toContain(':multiple="isPaid"')
+  })
+
+  it('stores auth and membership in localStorage instead of cookies', () => {
+    expect(fileNames(composableSources).sort()).toEqual([
+      'useAuthStorage.ts',
+      'useClientStorage.ts',
+      'useDeletedVideoIds.ts',
+      'useMembership.ts',
+    ])
+
+    const authSource = Object.entries(composableSources).find(([path]) => {
+      return path.endsWith('useAuthStorage.ts')
+    })?.[1]
+    const membershipSource = Object.entries(composableSources).find(([path]) => {
+      return path.endsWith('useMembership.ts')
+    })?.[1]
+    const clientStorageSource = Object.entries(composableSources).find(([path]) => {
+      return path.endsWith('useClientStorage.ts')
+    })?.[1]
+    const middlewareSource = Object.entries(middlewareSources).find(([path]) => {
+      return path.endsWith('auth.global.ts')
+    })?.[1]
+    const loginSource = Object.values(loginPage)[0]
+    const signupSource = Object.values(signupPage)[0]
+
+    expect(clientStorageSource).toBeDefined()
+    expect(clientStorageSource).toContain('localStorage.getItem')
+    expect(clientStorageSource).toContain('localStorage.setItem')
+    expect(clientStorageSource).toContain('localStorage.removeItem')
+    expect(clientStorageSource).not.toContain('useCookie')
+
+    expect(authSource).toBeDefined()
+    expect(authSource).toContain('useClientStorage')
+    expect(authSource).toContain('authStorageKey')
+    expect(authSource).not.toContain('useCookie')
+
+    expect(membershipSource).toBeDefined()
+    expect(membershipSource).toContain('useClientStorage')
+    expect(membershipSource).toContain('membershipStorageKey')
+    expect(membershipSource).not.toContain('useCookie')
+
+    expect(middlewareSource).toBeDefined()
+    expect(middlewareSource).toContain('import.meta.server')
+    expect(middlewareSource).toContain('useAuthStorage')
+    expect(middlewareSource).toContain('isAuthenticated')
+    expect(middlewareSource).not.toContain('useCookie')
+    expect(middlewareSource).not.toContain('useAuthCookie')
+
+    expect(loginSource).toContain('useAuthStorage')
+    expect(loginSource).toContain('authStorageValue')
+    expect(signupSource).toContain('useAuthStorage')
+    expect(signupSource).toContain('authStorageValue')
   })
 })
