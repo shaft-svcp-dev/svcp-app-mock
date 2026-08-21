@@ -23,6 +23,42 @@ export interface UploadingFile {
 export const selectFileButtonLabel = 'ファイルを選択'
 export const dropZoneTitle = 'ファイルをドラッグ＆ドロップ'
 export const dropZoneSubtitle = 'または下のボタンから選択'
+export const videoFileAccept = 'video/mp4,video/webm,video/quicktime'
+export const freeUploadLimit = 1
+export const freeUploadLimitNote
+  = '無料会員は動画を1本までアップロードできます。複数本のアップロードは有料会員で利用できます。'
+export const paidUploadMultipleNote = '複数の動画をまとめて選択できます。'
+
+export function isAllowedVideoFile(file: File): boolean {
+  if (file.type.startsWith('video/')) {
+    return true
+  }
+
+  return /\.(mp4|webm|mov)$/i.test(file.name)
+}
+
+export function limitSelectedFiles(files: readonly File[], isPaid: boolean): File[] {
+  const allowed = files.filter(isAllowedVideoFile)
+  if (isPaid) {
+    return allowed
+  }
+
+  return allowed.slice(0, freeUploadLimit)
+}
+
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) {
+    return `${bytes} B`
+  }
+
+  const kilobytes = bytes / 1024
+  if (kilobytes < 1024) {
+    return `${kilobytes.toFixed(1)} KB`
+  }
+
+  return `${(kilobytes / 1024).toFixed(1)} MB`
+}
+
 export const conversionPipelineTitle = '変換パイプライン進捗状況'
 export const conversionProgressLabel = '適応ビットレート動画を生成しています'
 export const conversionProgressPercent = 72

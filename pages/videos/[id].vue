@@ -21,14 +21,19 @@ definePageMeta({
 })
 
 const route = useRoute()
+const { isPaid } = useMembership()
+const { deletedIds, markDeleted } = useDeletedVideoIds()
 const video = videoListItems.find(item => item.id === route.params.id)
 
-if (!video) {
+// モック配列は消さない。削除済み id の Cookie がある動画は存在しないものとして扱う
+if (!video || deletedIds.value.includes(video.id)) {
   throw createError({
     statusCode: 404,
     statusMessage: 'Not Found',
   })
 }
+
+const videoId = video.id
 
 useHead({
   title: `${videoDetailTitle} | ${productName}`,
@@ -46,8 +51,8 @@ function openDeleteDialog() {
   deleteDialogOpen.value = true
 }
 
-// 確認後の遷移だけ実装する。モック配列からの削除は仕様にない
 async function confirmDelete() {
+  markDeleted(videoId)
   await navigateTo(videoListPath)
 }
 </script>
@@ -62,6 +67,7 @@ async function confirmDelete() {
         <span class="btn-label">{{ saveButtonLabel }}</span>
       </button>
       <button
+        v-if="isPaid"
         class="btn-outline header-delete"
         type="button"
         @click="openDeleteDialog"
@@ -96,6 +102,7 @@ async function confirmDelete() {
     />
   </div>
   <VideoDetailDeleteDialog
+    v-if="isPaid"
     v-model:open="deleteDialogOpen"
     @confirm="confirmDelete"
   />

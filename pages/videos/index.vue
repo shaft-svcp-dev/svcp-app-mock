@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { productName, videoListStatusQueryParam } from '~/mocks/dashboard'
 import type { VideoListStatusFilter } from '~/mocks/videos'
-import { videoListItems, videoListTitle } from '~/mocks/videos'
+import {
+  excludeDeletedVideos,
+  videoListItems,
+  videoListTitle,
+} from '~/mocks/videos'
 
 definePageMeta({
   screenClass: 'screen-video-list',
@@ -10,6 +14,8 @@ definePageMeta({
 useHead({
   title: `${videoListTitle} | ${productName}`,
 })
+
+const { deletedIds } = useDeletedVideoIds()
 
 function statusFilterFromQuery(value: unknown): VideoListStatusFilter {
   // 同一キーの重複は配列。published / unpublished 以外は絞り込みなし
@@ -42,7 +48,7 @@ function uploadedAtTime(value: string): number {
 const visibleVideos = computed(() => {
   const normalizedSearch = searchQuery.value.trim()
 
-  return videoListItems
+  return excludeDeletedVideos(videoListItems, deletedIds.value)
     .filter((video) => {
       const matchesStatus = statusFilter.value === 'all' || video.status === statusFilter.value
       const matchesSearch = normalizedSearch === '' || video.title.includes(normalizedSearch)

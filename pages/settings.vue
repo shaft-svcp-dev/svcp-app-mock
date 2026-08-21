@@ -2,6 +2,9 @@
 // ページ名 Settings と prefix Settings* が重なり、自動解決がページ変換に乗らない
 import SettingsAccountInfo from '~/components/settings/AccountInfo.vue'
 import SettingsDeleteDialog from '~/components/settings/DeleteDialog.vue'
+import SettingsMembershipStatus from '~/components/settings/MembershipStatus.vue'
+import SettingsPaymentCompleteDialog from '~/components/settings/PaymentCompleteDialog.vue'
+import SettingsPaymentForm from '~/components/settings/PaymentForm.vue'
 import { productName } from '~/mocks/dashboard'
 import { loginPath } from '~/mocks/login'
 import {
@@ -20,7 +23,9 @@ useHead({
 })
 
 const authenticated = useAuthCookie()
+const { isPaid, markPaid } = useMembership()
 const deleteDialogOpen = ref(false)
+const paymentCompleteOpen = ref(false)
 const maskedEmail = maskEmail(registeredAccount.email)
 
 function openDeleteDialog() {
@@ -31,6 +36,15 @@ async function confirmDelete() {
   // モックに削除 API は無い。ログアウトと同じく認証 Cookie を消してログインへ戻す
   authenticated.value = null
   await navigateTo(loginPath)
+}
+
+function onPay() {
+  // カード情報は送らない。完了ダイアログだけ出して決済したように見せる
+  paymentCompleteOpen.value = true
+}
+
+function confirmPayment() {
+  markPaid()
 }
 </script>
 
@@ -52,9 +66,18 @@ async function confirmDelete() {
       :full-name="registeredAccount.fullName"
       :email="maskedEmail"
     />
+    <SettingsMembershipStatus :paid="isPaid" />
+    <SettingsPaymentForm
+      v-if="!isPaid"
+      @pay="onPay"
+    />
   </div>
   <SettingsDeleteDialog
     v-model:open="deleteDialogOpen"
     @confirm="confirmDelete"
+  />
+  <SettingsPaymentCompleteDialog
+    v-model:open="paymentCompleteOpen"
+    @confirm="confirmPayment"
   />
 </template>

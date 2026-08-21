@@ -73,6 +73,15 @@
   height: 37px;
   white-space: nowrap;
   flex: none;
+  cursor: pointer;
+}
+
+.upload-limit-note {
+  margin: 0;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  color: #475569;
 }
 
 .conversion-pipeline {

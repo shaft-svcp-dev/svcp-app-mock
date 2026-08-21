@@ -6,13 +6,16 @@ import {
   recentUploads,
   viewAllLabel,
 } from '~/mocks/dashboard'
-import { videoListItems } from '~/mocks/videos'
+import { excludeDeletedVideos, videoListItems } from '~/mocks/videos'
 
 definePageMeta({
   screenClass: 'screen-dashboard',
 })
 
-const dashboardStats = buildDashboardStats(videoListItems)
+const { deletedIds } = useDeletedVideoIds()
+const visibleVideos = computed(() => excludeDeletedVideos(videoListItems, deletedIds.value))
+const visibleRecentUploads = computed(() => excludeDeletedVideos(recentUploads, deletedIds.value))
+const dashboardStats = computed(() => buildDashboardStats(visibleVideos.value))
 </script>
 
 <template>
@@ -40,7 +43,7 @@ const dashboardStats = buildDashboardStats(videoListItems)
       </div>
       <div class="uploads-list">
         <DashboardVideoRow
-          v-for="upload in recentUploads"
+          v-for="upload in visibleRecentUploads"
           :key="upload.id"
           :upload="upload"
         />

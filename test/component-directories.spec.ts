@@ -227,6 +227,9 @@ describe('component directories', () => {
     expect(fileNames(settingsComponents).sort()).toEqual([
       'AccountInfo.vue',
       'DeleteDialog.vue',
+      'MembershipStatus.vue',
+      'PaymentCompleteDialog.vue',
+      'PaymentForm.vue',
     ])
   })
 
@@ -236,9 +239,29 @@ describe('component directories', () => {
     expect(source).toBeDefined()
     expect(source).toContain("~/components/settings/AccountInfo.vue")
     expect(source).toContain("~/components/settings/DeleteDialog.vue")
+    expect(source).toContain("~/components/settings/MembershipStatus.vue")
+    expect(source).toContain("~/components/settings/PaymentForm.vue")
+    expect(source).toContain("~/components/settings/PaymentCompleteDialog.vue")
     expect(source).toContain('registeredAccount')
     expect(source).toContain('maskEmail')
     expect(source).toContain('authenticated.value = null')
     expect(source).toContain('navigateTo(loginPath)')
+    expect(source).toContain('markPaid')
+    expect(source).toContain('paymentCompleteOpen')
+  })
+
+  it('gates video delete and multi-file upload on paid membership', () => {
+    const detailSource = Object.entries(videoPages).find(([path]) => path.includes('[id]'))?.[1]
+    const uploadSource = Object.values(uploadPage)[0]
+
+    expect(detailSource).toBeDefined()
+    expect(detailSource).toContain('isPaid')
+    expect(detailSource).toContain('v-if="isPaid"')
+    expect(detailSource).toContain('markDeleted')
+
+    expect(uploadSource).toBeDefined()
+    expect(uploadSource).toContain('isPaid')
+    expect(uploadSource).toContain('limitSelectedFiles')
+    expect(uploadSource).toContain(':multiple="isPaid"')
   })
 })

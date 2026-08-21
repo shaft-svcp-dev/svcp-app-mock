@@ -12,6 +12,9 @@ import {
   videoStatusLabel,
 } from '../mocks/dashboard'
 import {
+  deletedVideoIdsCookieName,
+  excludeDeletedVideos,
+  parseDeletedVideoIds,
   searchPlaceholder,
   sortButtonLabel,
   statusFilterOptions,
@@ -27,8 +30,14 @@ import {
   conversionSteps,
   dropZoneSubtitle,
   dropZoneTitle,
+  formatFileSize,
+  freeUploadLimit,
+  freeUploadLimitNote,
+  limitSelectedFiles,
+  paidUploadMultipleNote,
   selectFileButtonLabel,
   uploadingFile,
+  videoFileAccept,
 } from '../mocks/upload'
 import {
   cancelButtonLabel,
@@ -100,12 +109,28 @@ import {
 } from '../mocks/password-reset'
 import {
   accountSectionTitle,
+  cardCvcFieldLabel,
+  cardExpiryFieldLabel,
+  cardHolderFieldLabel,
+  cardNumberFieldLabel,
+  cardNumberPlaceholder,
   deleteAccountButtonLabel,
   deleteAccountConfirmCancelLabel,
   deleteAccountConfirmMessage,
   deleteAccountConfirmOkLabel,
   deleteAccountConfirmTitle,
+  freeMemberLabel,
+  isPaidMembership,
   maskEmail,
+  membershipCookieName,
+  membershipSectionTitle,
+  paidMemberLabel,
+  paidMembershipValue,
+  payButtonLabel,
+  paymentCompleteConfirmLabel,
+  paymentCompleteTitle,
+  paymentSectionDescription,
+  paymentSectionTitle,
   registeredAccount,
   settingsPath,
   settingsTitle,
@@ -126,10 +151,15 @@ async function stylesheetText(html: string): Promise<string> {
   return [...inline, ...linked].join('\n')
 }
 
-function authenticatedFetch(path: string) {
+function authenticatedFetch(path: string, extraCookies: Record<string, string> = {}) {
+  const cookie = [
+    `${authCookieName}=${authCookieValue}`,
+    ...Object.entries(extraCookies).map(([name, value]) => `${name}=${encodeURIComponent(value)}`),
+  ].join('; ')
+
   return $fetch<string>(path, {
     headers: {
-      cookie: `${authCookieName}=${authCookieValue}`,
+      cookie,
     },
   })
 }
@@ -171,6 +201,10 @@ function selectedOptionValue(html: string): string | undefined {
 
 function accountInfoHtml(html: string): string {
   return html.match(/<section[^>]*class="[^"]*\baccount-info\b[^"]*"[^>]*>[\s\S]*?<\/section>/)?.[0] ?? ''
+}
+
+function membershipStatusHtml(html: string): string {
+  return html.match(/<section[^>]*class="[^"]*\bmembership-status\b[^"]*"[^>]*>[\s\S]*?<\/section>/)?.[0] ?? ''
 }
 
 describe('SVCP mock screens', async () => {
@@ -503,7 +537,6 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(videoDetailTitle)
     expect(html).toContain(cancelButtonLabel)
     expect(html).toContain(saveButtonLabel)
-    expect(html).toContain(deleteButtonLabel)
     expect(html).toContain(titleFieldLabel)
     expect(html).toContain(descriptionFieldLabel)
     expect(html).toContain(visibilitySectionTitle)
@@ -575,14 +608,25 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.copy-btn\{[^}]*white-space:nowrap/)
   })
 
+  it('hides video delete controls for free members', async () => {
+    const video = videoListItems[0]
+    const html = await authenticatedFetch(`/videos/${video.id}`)
+
+    expect(isPaidMembership(undefined)).toBe(false)
+    expect(elementOpeningTag(html, 'header-delete')).toBeUndefined()
+    expect(html).not.toContain(deleteConfirmMessage)
+    expect(html).not.toContain(deleteConfirmTitle)
+  })
+
   it('renders the video detail delete confirmation dialog and publish toggle from mock data', async () => {
     const publishedVideo = videoListItems[0]
     const unpublishedVideo = videoListItems.find(video => video.status === 'unpublished')
     expect(publishedVideo.status).toBe('published')
     expect(unpublishedVideo).toBeDefined()
 
-    const html = await authenticatedFetch(`/videos/${publishedVideo.id}`)
-    const unpublishedHtml = await authenticatedFetch(`/videos/${unpublishedVideo!.id}`)
+    const paid = { [membershipCookieName]: paidMembershipValue }
+    const html = await authenticatedFetch(`/videos/${publishedVideo.id}`, paid)
+    const unpublishedHtml = await authenticatedFetch(`/videos/${unpublishedVideo!.id}`, paid)
 
     const headerActions = headerActionsHtml(html)
     expect(headerActions).toContain(deleteButtonLabel)
@@ -702,6 +746,23 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(conversionPipelineNote)
     expect(html).toContain(uploadingFile.filename)
     expect(html).toContain(uploadingFile.metadata)
+    expect(html).toContain(freeUploadLimitNote)
+    expect(html).not.toContain(paidUploadMultipleNote)
+    expect(html).toContain(videoFileAccept)
+
+    const first = new File(['a'], 'first.mp4', { type: 'video/mp4' })
+    const second = new File(['b'], 'second.mp4', { type: 'video/mp4' })
+    const textFile = new File(['c'], 'notes.txt', { type: 'text/plain' })
+    expect(limitSelectedFiles([first, second], false)).toEqual([first])
+    expect(limitSelectedFiles([first, second], true)).toEqual([first, second])
+    expect(limitSelectedFiles([textFile, first], false)).toEqual([first])
+    expect(freeUploadLimit).toBe(1)
+    expect(formatFileSize(512)).toBe('512 B')
+    expect(formatFileSize(2048)).toBe('2.0 KB')
+
+    const fileInput = html.match(/<input\b[^>]*type="file"[^>]*>/)?.[0]
+    expect(fileInput).toBeDefined()
+    expect(fileInput).not.toMatch(/\bmultiple\b/)
 
     for (const step of conversionSteps) {
       expect(html).toContain(step.label)
@@ -721,6 +782,19 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.select-file-btn\{[^}]*width:auto/)
   })
 
+  it('lets paid members select multiple videos on the upload screen', async () => {
+    const html = await authenticatedFetch('/upload', {
+      [membershipCookieName]: paidMembershipValue,
+    })
+
+    expect(html).toContain(paidUploadMultipleNote)
+    expect(html).not.toContain(freeUploadLimitNote)
+
+    const fileInput = html.match(/<input\b[^>]*type="file"[^>]*>/)?.[0]
+    expect(fileInput).toBeDefined()
+    expect(fileInput).toMatch(/\bmultiple\b/)
+  })
+
   it('sends unauthenticated visitors from settings to the login screen', async () => {
     const html = await $fetch<string>(settingsPath)
 
@@ -733,6 +807,7 @@ describe('SVCP mock screens', async () => {
   it('renders the settings screen from mock account data with settings nav active', async () => {
     const html = await authenticatedFetch(settingsPath)
     const accountInfo = accountInfoHtml(html)
+    const membershipStatus = membershipStatusHtml(html)
     const maskedEmail = maskEmail(registeredAccount.email)
 
     expect(maskEmail('hana@example.com')).toBe('h***@example.com')
@@ -753,6 +828,27 @@ describe('SVCP mock screens', async () => {
     expect(accountInfo).toContain(maskedEmail)
     expect(accountInfo).not.toContain(registeredAccount.email)
 
+    expect(isPaidMembership(undefined)).toBe(false)
+    expect(isPaidMembership(paidMembershipValue)).toBe(true)
+    expect(html).toContain(membershipSectionTitle)
+    expect(membershipStatus).toContain(freeMemberLabel)
+    expect(membershipStatus).not.toContain(paidMemberLabel)
+    expect(html).toContain(paymentSectionTitle)
+    expect(html).toContain(paymentSectionDescription)
+    expect(html).toContain(cardNumberFieldLabel)
+    expect(html).toContain(cardExpiryFieldLabel)
+    expect(html).toContain(cardCvcFieldLabel)
+    expect(html).toContain(cardHolderFieldLabel)
+    expect(html).toContain(payButtonLabel)
+    expect(html).toContain(cardNumberPlaceholder)
+    expect(html).not.toContain('4242')
+
+    const paymentOverlay = elementOpeningTag(html, 'payment-complete-overlay')
+    expect(paymentOverlay).toBeDefined()
+    expect(paymentOverlay).toMatch(/\bhidden\b/)
+    expect(html).toContain(paymentCompleteTitle)
+    expect(html).toContain(paymentCompleteConfirmLabel)
+
     expect(html).toContain(deleteAccountButtonLabel)
     expect(html).toContain(dashboardUser.name)
     expect(html).toContain(dashboardUser.role)
@@ -772,9 +868,43 @@ describe('SVCP mock screens', async () => {
     expect(videosNav).not.toContain('nav-item-active')
 
     const css = (await stylesheetText(html)).replace(/\s+/g, '')
-    expect(css).toMatch(/\.account-info\{[^}]*background:#fff/)
-    expect(css).toMatch(/\.account-info\{[^}]*border-radius:12px/)
+    // アカウント・会員・支払いカードでセレクタを共有しているため、クラス名の直後が { とは限らない
+    expect(css).toMatch(/\.account-info[,{][^}]*background:#fff/)
+    expect(css).toMatch(/\.account-info[,{][^}]*border-radius:12px/)
+    expect(css).toMatch(/\.membership-status[,{][^}]*background:#fff/)
+    expect(css).toMatch(/\.badge-free\{[^}]*background:#f1f5f9/)
+    expect(css).toMatch(/\.badge-paid\{[^}]*background:#ecfdf5/)
+    expect(css).toMatch(/\.payment-form[,{][^}]*background:#fff/)
     expect(css).toMatch(/\.header-delete\{[^}]*cursor:pointer/)
+  })
+
+  it('shows paid membership status and hides the payment form', async () => {
+    const html = await authenticatedFetch(settingsPath, {
+      [membershipCookieName]: paidMembershipValue,
+    })
+    const membershipStatus = membershipStatusHtml(html)
+
+    expect(membershipStatus).toContain(paidMemberLabel)
+    expect(membershipStatus).not.toContain(freeMemberLabel)
+    expect(html).not.toContain(payButtonLabel)
+    expect(html).not.toContain(cardNumberFieldLabel)
+    expect(html).toContain(membershipSectionTitle)
+  })
+
+  it('hides deleted videos from the list for paid members', async () => {
+    const video = videoListItems[0]
+    expect(parseDeletedVideoIds(undefined)).toEqual([])
+    expect(parseDeletedVideoIds(video.id)).toEqual([video.id])
+    expect(excludeDeletedVideos(videoListItems, [video.id]).some(item => item.id === video.id))
+      .toBe(false)
+
+    const html = await authenticatedFetch('/videos', {
+      [membershipCookieName]: paidMembershipValue,
+      [deletedVideoIdsCookieName]: video.id,
+    })
+
+    expect(html).not.toContain(video.title)
+    expect(html).toContain(videoListItems[1].title)
   })
 
   it('renders the settings delete confirmation dialog from mock data', async () => {

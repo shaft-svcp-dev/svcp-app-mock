@@ -1,4 +1,6 @@
-.account-info {
+.account-info,
+.membership-status,
+.payment-form {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -41,4 +43,89 @@
   font-size: 14px;
   line-height: 17px;
   color: #0f172a;
+}
+
+.badge-free {
+  background: #f1f5f9;
+}
+
+.badge-free .badge-label {
+  color: #475569;
+}
+
+.badge-paid {
+  background: #ecfdf5;
+}
+
+.badge-paid .badge-label {
+  color: #10b981;
+}
+
+.payment-description {
+  margin: 0;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  color: #475569;
+}
+
+.payment-fields {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+}
+
+.payment-field-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+}
+
+.payment-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.payment-label {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  color: #0f172a;
+}
+
+.payment-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 41px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  font-family: inherit;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  color: #0f172a;
+}
+
+.payment-input::placeholder {
+  color: #94a3b8;
+}
+
+.payment-input:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+.payment-submit {
+  width: 100%;
+  height: 37px;
+  cursor: pointer;
 }
