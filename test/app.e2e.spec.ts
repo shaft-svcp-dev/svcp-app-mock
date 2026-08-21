@@ -649,6 +649,15 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(subtitleHint)
     expect(html).toContain(subtitleFileAccept)
 
+    const titleFieldIndex = html.indexOf('class="field-title"')
+    const descriptionFieldIndex = html.indexOf('class="field-description"')
+    const thumbnailSettingsIndex = html.indexOf(thumbnailSectionTitle)
+    const subtitleSettingsIndex = html.indexOf(subtitleSectionTitle)
+    expect(titleFieldIndex).toBeGreaterThan(-1)
+    expect(descriptionFieldIndex).toBeGreaterThan(titleFieldIndex)
+    expect(thumbnailSettingsIndex).toBeGreaterThan(descriptionFieldIndex)
+    expect(subtitleSettingsIndex).toBeGreaterThan(thumbnailSettingsIndex)
+
     const preview = elementOpeningTag(html, 'thumbnail-preview')
     expect(preview).toBeDefined()
     expect(preview).toContain(`src="${video.thumbnailSrc}"`)

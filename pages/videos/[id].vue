@@ -77,6 +77,10 @@ async function confirmDelete() {
         :poster-src="thumbnailSrc"
         :subtitles="subtitles"
       />
+      <VideoDetailMetaInputs
+        v-model:title="title"
+        v-model:description="description"
+      />
       <div class="media-settings-row">
         <VideoDetailThumbnailSettings
           v-model:src="thumbnailSrc"
@@ -85,10 +89,6 @@ async function confirmDelete() {
         />
         <VideoDetailSubtitleSettings v-model="subtitles" />
       </div>
-      <VideoDetailMetaInputs
-        v-model:title="title"
-        v-model:description="description"
-      />
     </div>
     <VideoDetailSidePane
       :video="video"
