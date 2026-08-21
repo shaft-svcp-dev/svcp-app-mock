@@ -1,0 +1,44 @@
+.account-info {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  max-width: 640px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.account-rows {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.account-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
+}
+
+.account-label {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  color: #475569;
+}
+
+.account-value {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  color: #0f172a;
+}

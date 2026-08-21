@@ -40,6 +40,12 @@ const passwordResetPages = import.meta.glob('../pages/password-reset/*.vue', {
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
+const settingsComponents = import.meta.glob('../components/settings/*.vue')
+const settingsPage = import.meta.glob('../pages/settings.vue', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
 
 function fileNames(modules: Record<string, unknown>): string[] {
   return Object.keys(modules).map(path => path.split('/').at(-1) ?? path)
@@ -183,5 +189,24 @@ describe('component directories', () => {
     expect(source).toContain('layout: false')
     expect(source).toContain('passwordResetSentTitle')
     expect(source).toContain('loginScreenLinkLabel')
+  })
+
+  it('places settings page components in components/settings', () => {
+    expect(fileNames(settingsComponents).sort()).toEqual([
+      'AccountInfo.vue',
+      'DeleteDialog.vue',
+    ])
+  })
+
+  it('imports settings components from the settings page', () => {
+    // ページ名 Settings と prefix Settings* が重なると自動解決が乗らず、SSRとクライアントが食い違う
+    const source = Object.values(settingsPage)[0]
+    expect(source).toBeDefined()
+    expect(source).toContain("~/components/settings/AccountInfo.vue")
+    expect(source).toContain("~/components/settings/DeleteDialog.vue")
+    expect(source).toContain('registeredAccount')
+    expect(source).toContain('maskEmail')
+    expect(source).toContain('authenticated.value = null')
+    expect(source).toContain('navigateTo(loginPath)')
   })
 })

@@ -87,6 +87,18 @@ import {
   passwordResetSentTitle,
   passwordResetTitle,
 } from '../mocks/password-reset'
+import {
+  accountSectionTitle,
+  deleteAccountButtonLabel,
+  deleteAccountConfirmCancelLabel,
+  deleteAccountConfirmMessage,
+  deleteAccountConfirmOkLabel,
+  deleteAccountConfirmTitle,
+  maskEmail,
+  registeredAccount,
+  settingsPath,
+  settingsTitle,
+} from '../mocks/settings'
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -144,6 +156,10 @@ function statCardByLabel(html: string, label: string): string | undefined {
 function selectedOptionValue(html: string): string | undefined {
   return html.match(/<option[^>]*value="([^"]*)"[^>]*selected/)?.[1]
     ?? html.match(/<option[^>]*selected[^>]*value="([^"]*)"/)?.[1]
+}
+
+function accountInfoHtml(html: string): string {
+  return html.match(/<section[^>]*class="[^"]*\baccount-info\b[^"]*"[^>]*>[\s\S]*?<\/section>/)?.[0] ?? ''
 }
 
 describe('SVCP mock screens', async () => {
@@ -637,5 +653,91 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.drop-zone\{[^}]*border:2pxdashed#2563eb/)
     expect(css).toMatch(/\.select-file-btn\{[^}]*white-space:nowrap/)
     expect(css).toMatch(/\.select-file-btn\{[^}]*width:auto/)
+  })
+
+  it('sends unauthenticated visitors from settings to the login screen', async () => {
+    const html = await $fetch<string>(settingsPath)
+
+    expect(html).toContain(loginButtonLabel)
+    expect(html).toContain(emailFieldLabel)
+    expect(html).not.toContain(accountSectionTitle)
+    expect(html).not.toContain(deleteAccountButtonLabel)
+  })
+
+  it('renders the settings screen from mock account data with settings nav active', async () => {
+    const html = await authenticatedFetch(settingsPath)
+    const accountInfo = accountInfoHtml(html)
+    const maskedEmail = maskEmail(registeredAccount.email)
+
+    expect(maskEmail('hana@example.com')).toBe('h***@example.com')
+    expect(maskEmail('a@x.com')).toBe('a*@x.com')
+    expect(maskedEmail).toBe('t**********@example.com')
+
+    expect(html).toContain(settingsTitle)
+    expect(html).toContain(accountSectionTitle)
+    expect(html).toContain(companyFieldLabel)
+    expect(html).toContain(fullNameFieldLabel)
+    expect(html).toContain(emailFieldLabel)
+    expect(html).not.toContain(passwordFieldLabel)
+    expect(html).not.toContain(passwordConfirmFieldLabel)
+    expect(html).not.toMatch(/<input[^>]*type="password"/)
+
+    expect(accountInfo).toContain(registeredAccount.companyName)
+    expect(accountInfo).toContain(registeredAccount.fullName)
+    expect(accountInfo).toContain(maskedEmail)
+    expect(accountInfo).not.toContain(registeredAccount.email)
+
+    expect(html).toContain(deleteAccountButtonLabel)
+    expect(html).toContain(dashboardUser.name)
+    expect(html).toContain(dashboardUser.role)
+
+    const headerActions = headerActionsHtml(html)
+    expect(headerActions).toContain(deleteAccountButtonLabel)
+    expect(headerActions).toMatch(
+      new RegExp(`<button[^>]*>[\\s\\S]*?${escapeRegExp(deleteAccountButtonLabel)}`),
+    )
+
+    const dashboardNav = firstAnchorWithHref(html, '/')
+    const videosNav = firstAnchorWithHref(html, '/videos')
+    const settingsNav = firstAnchorWithHref(html, settingsPath)
+    expect(settingsNav).toContain('nav-item-active')
+    expect(settingsNav).toContain('aria-current="page"')
+    expect(dashboardNav).not.toContain('nav-item-active')
+    expect(videosNav).not.toContain('nav-item-active')
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.account-info\{[^}]*background:#fff/)
+    expect(css).toMatch(/\.account-info\{[^}]*border-radius:12px/)
+    expect(css).toMatch(/\.header-delete\{[^}]*cursor:pointer/)
+  })
+
+  it('renders the settings delete confirmation dialog from mock data', async () => {
+    const html = await authenticatedFetch(settingsPath)
+
+    expect(html).toMatch(/role="dialog"/)
+    expect(html).toContain(deleteAccountConfirmTitle)
+    expect(html).toContain(deleteAccountConfirmMessage)
+    expect(html).toContain(deleteAccountConfirmOkLabel)
+    expect(html).toContain(deleteAccountConfirmCancelLabel)
+
+    const overlayTag = elementOpeningTag(html, 'delete-dialog-overlay')
+    expect(overlayTag).toBeDefined()
+    expect(overlayTag).toMatch(/\bhidden\b/)
+
+    const dialog = dialogHtml(html)
+    expect(dialog).toContain(deleteAccountConfirmTitle)
+    expect(dialog).toContain(deleteAccountConfirmMessage)
+    expect(dialog).toContain(deleteAccountConfirmOkLabel)
+    expect(dialog).toContain(deleteAccountConfirmCancelLabel)
+    expect(dialog).toMatch(
+      new RegExp(`<button[^>]*>[\\s\\S]*?${escapeRegExp(deleteAccountConfirmCancelLabel)}`),
+    )
+    expect(dialog).toMatch(
+      new RegExp(`<button[^>]*>[\\s\\S]*?${escapeRegExp(deleteAccountConfirmOkLabel)}`),
+    )
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.delete-dialog-overlay\{[^}]*position:fixed/)
+    expect(css).toMatch(/\.delete-dialog-overlay\[hidden\]\{[^}]*display:none/)
   })
 })
