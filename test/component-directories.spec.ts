@@ -34,6 +34,12 @@ const signupPage = import.meta.glob('../pages/signup.vue', {
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
+const passwordResetComponents = import.meta.glob('../components/password-reset/*.vue')
+const passwordResetPages = import.meta.glob('../pages/password-reset/*.vue', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
 
 function fileNames(modules: Record<string, unknown>): string[] {
   return Object.keys(modules).map(path => path.split('/').at(-1) ?? path)
@@ -146,5 +152,33 @@ describe('component directories', () => {
     expect(source).toContain("~/components/signup/TermsConsent.vue")
     expect(source).toContain("~/components/signup/Submit.vue")
     expect(source).toContain('layout: false')
+  })
+
+  it('places password-reset page components in components/password-reset', () => {
+    expect(fileNames(passwordResetComponents).sort()).toEqual([
+      'Branding.vue',
+      'FormFields.vue',
+      'Submit.vue',
+    ])
+  })
+
+  it('imports password-reset components from the form page without the shared chrome layout', () => {
+    // ページ名 PasswordReset と prefix PasswordReset* が重なると自動解決が乗らず、SSRとクライアントが食い違う
+    const source = Object.entries(passwordResetPages).find(([path]) => path.endsWith('index.vue'))?.[1]
+    expect(source).toBeDefined()
+    expect(source).toContain("~/components/password-reset/Branding.vue")
+    expect(source).toContain("~/components/password-reset/FormFields.vue")
+    expect(source).toContain("~/components/password-reset/Submit.vue")
+    expect(source).toContain('layout: false')
+    expect(source).toContain('navigateTo(passwordResetSentPath)')
+  })
+
+  it('keeps the password-reset sent page without the shared chrome layout', () => {
+    const source = Object.entries(passwordResetPages).find(([path]) => path.endsWith('sent.vue'))?.[1]
+    expect(source).toBeDefined()
+    expect(source).toContain("~/components/password-reset/Branding.vue")
+    expect(source).toContain('layout: false')
+    expect(source).toContain('passwordResetSentTitle')
+    expect(source).toContain('loginScreenLinkLabel')
   })
 })

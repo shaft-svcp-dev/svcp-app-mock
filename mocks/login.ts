@@ -15,6 +15,10 @@ export const signupPromptLabel = 'アカウントをお持ちですか？'
 export const signupLinkLabel = '会員登録はこちら'
 export const signupPath = '/signup'
 export const loginPath = '/login'
+// 会員登録リンクの下に置く。文言は画面仕様で、Figma レイヤーは無い
+export const forgotPasswordPromptLabel = 'パスワードをお忘れの場合は'
+export const forgotPasswordLinkLabel = 'こちら'
+export const passwordResetPath = '/password-reset'
 
 // 資格情報は持たない。ログイン操作の有無だけを Cookie で表す
 export const authCookieName = 'svcp-authenticated'

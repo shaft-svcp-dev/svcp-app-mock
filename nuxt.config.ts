@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '~/assets/css/upload.css',
     '~/assets/css/login.css',
     '~/assets/css/signup.css',
+    '~/assets/css/password-reset.css',
   ],
   components: [
     {
@@ -41,6 +42,10 @@ export default defineNuxtConfig({
     {
       path: '~/components/signup',
       prefix: 'Signup',
+    },
+    {
+      path: '~/components/password-reset',
+      prefix: 'PasswordReset',
     },
   ],
   app: {

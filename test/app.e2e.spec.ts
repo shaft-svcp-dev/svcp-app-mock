@@ -52,7 +52,10 @@ import {
   loginTagline,
   passwordFieldLabel,
   passwordPlaceholder,
+  forgotPasswordLinkLabel,
+  forgotPasswordPromptLabel,
   loginPath,
+  passwordResetPath,
   signupLinkLabel,
   signupPath,
   signupPromptLabel,
@@ -70,6 +73,13 @@ import {
   signupTitle,
   termsConsentLabel,
 } from '../mocks/signup'
+import {
+  loginScreenLinkLabel,
+  passwordResetButtonLabel,
+  passwordResetSentPath,
+  passwordResetSentTitle,
+  passwordResetTitle,
+} from '../mocks/password-reset'
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -121,6 +131,10 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(signupPromptLabel)
     expect(html).toContain(signupLinkLabel)
     expect(firstAnchorWithHref(html, signupPath)).toBeDefined()
+    expect(html).toContain(forgotPasswordPromptLabel)
+    expect(html).toContain(forgotPasswordLinkLabel)
+    expect(firstAnchorWithHref(html, passwordResetPath)).toBeDefined()
+    expect(html.indexOf(signupLinkLabel)).toBeLessThan(html.indexOf(forgotPasswordPromptLabel))
     expect(html).not.toContain(dashboardUser.name)
     expect(html).not.toContain('メインナビゲーション')
     expect(html).toMatch(/<input[^>]*type="email"/)
@@ -172,6 +186,45 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.registration-card.logo-mark\{[^}]*height:36px/)
   })
 
+  it('renders the password-reset screen from mock data without the shared chrome', async () => {
+    const html = await $fetch<string>(passwordResetPath)
+
+    expect(html).toContain(productName)
+    expect(html).toContain(passwordResetTitle)
+    expect(html).toContain(emailFieldLabel)
+    expect(html).toContain(emailPlaceholder)
+    expect(html).toContain(passwordResetButtonLabel)
+    expect(html).toContain(loginScreenLinkLabel)
+    expect(firstAnchorWithHref(html, loginPath)).toBeDefined()
+    expect(html).not.toContain(dashboardUser.name)
+    expect(html).not.toContain('メインナビゲーション')
+    expect(html).toMatch(/<input[^>]*type="email"/)
+    expect(html).not.toMatch(/<input[^>]*type="password"/)
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    // 入力画面と完了画面でセレクタを共有しているため、クラス名の直後が { とは限らない
+    expect(css).toMatch(/\.screen-password-reset[,{][^}]*justify-content:center/)
+    expect(css).toMatch(/\.screen-password-reset[,{][^}]*background:#f8fafc/)
+    expect(css).toMatch(/\.password-reset-card\{[^}]*width:440px/)
+    expect(css).toMatch(/\.password-reset-card\{[^}]*border-radius:16px/)
+  })
+
+  it('renders the password-reset sent screen from mock data without the shared chrome', async () => {
+    const html = await $fetch<string>(passwordResetSentPath)
+
+    expect(html).toContain(productName)
+    expect(html).toContain(passwordResetSentTitle)
+    expect(html).toContain(loginScreenLinkLabel)
+    expect(firstAnchorWithHref(html, loginPath)).toBeDefined()
+    expect(html).not.toContain(dashboardUser.name)
+    expect(html).not.toContain('メインナビゲーション')
+    expect(html).not.toMatch(/<input[^>]*type="email"/)
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.screen-password-reset-sent\{[^}]*justify-content:center/)
+    expect(css).toMatch(/\.screen-password-reset-sent\{[^}]*background:#f8fafc/)
+  })
+
   it('sends unauthenticated visitors from the dashboard to the login screen', async () => {
     const html = await $fetch<string>('/')
 
@@ -188,6 +241,17 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(dashboardUser.name)
     expect(html).not.toContain(signupTitle)
     expect(html).not.toContain(companyFieldLabel)
+  })
+
+  it('keeps authenticated visitors on the dashboard instead of the password-reset screens', async () => {
+    const resetHtml = await authenticatedFetch(passwordResetPath)
+    const sentHtml = await authenticatedFetch(passwordResetSentPath)
+
+    expect(resetHtml).toContain('総動画数')
+    expect(resetHtml).toContain(dashboardUser.name)
+    expect(resetHtml).not.toContain(passwordResetButtonLabel)
+    expect(sentHtml).toContain('総動画数')
+    expect(sentHtml).not.toContain(passwordResetSentTitle)
   })
 
   it('renders the dashboard chrome, stats, and recent uploads from mock data', async () => {
