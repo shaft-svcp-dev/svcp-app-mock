@@ -121,9 +121,12 @@ export const dashboardNavItems: readonly DashboardNavItem[] = [
   { id: 'settings', label: '設定', icon: 'sliders-horizontal', to: '/settings' },
 ]
 
+/**
+ * 詳細画面は videoListItems の id で引くため、同じ動画を指す id は一覧側に合わせる。
+ */
 export const recentUploads: readonly RecentUpload[] = [
   {
-    id: 'upload-product-ui',
+    id: 'video-product-ui',
     title: '製品UIデモ：ダッシュボード操作説明',
     duration: '再生時間 12:48',
     size: 'ファイルサイズ 245.8MB',
@@ -133,7 +136,7 @@ export const recentUploads: readonly RecentUpload[] = [
     thumbnailAlt: '製品UIデモ動画のサムネイル',
   },
   {
-    id: 'upload-training',
+    id: 'video-training',
     title: '社内研修：アーキテクチャ解説セッション',
     duration: '再生時間 18:05',
     size: 'ファイルサイズ 312.4MB',
@@ -143,7 +146,7 @@ export const recentUploads: readonly RecentUpload[] = [
     thumbnailAlt: '社内研修動画のサムネイル',
   },
   {
-    id: 'upload-brand-movie',
+    id: 'video-brand-movie',
     title: 'ブランドムービー：夕暮れの山並み',
     duration: '再生時間 03:27',
     size: 'ファイルサイズ 1.02GB',

@@ -4,9 +4,11 @@ import {
   dashboardUser,
   logoutButtonLabel,
   productName,
+  recentUploads,
   totalPlayCountStatLabel,
   totalVideosStatLabel,
   uploadButtonLabel,
+  videoListPath,
   videoStatusLabel,
 } from '../mocks/dashboard'
 import {
@@ -32,6 +34,11 @@ import {
   cancelButtonLabel,
   copyButtonLabel,
   copySuccessLabel,
+  deleteButtonLabel,
+  deleteConfirmCancelLabel,
+  deleteConfirmMessage,
+  deleteConfirmOkLabel,
+  deleteConfirmTitle,
   descriptionFieldLabel,
   metadataSectionTitle,
   metadataRowLabels,
@@ -106,6 +113,21 @@ function authenticatedFetch(path: string) {
 
 function headerActionsHtml(html: string): string {
   return html.match(/<div class="header-actions">[\s\S]*?<\/div>/)?.[0] ?? ''
+}
+
+function dialogHtml(html: string): string {
+  return html.match(/<(?:div|dialog)[^>]*role="dialog"[^>]*>[\s\S]*?<\/(?:div|dialog)>/)?.[0] ?? ''
+}
+
+function elementOpeningTag(html: string, className: string): string | undefined {
+  return html.match(
+    new RegExp(`<[^>]*\\bclass="[^"]*\\b${escapeRegExp(className)}\\b[^"]*"[^>]*>`),
+  )?.[0]
+}
+
+function switchButtonOpeningTag(html: string): string | undefined {
+  return html.match(/<button\b[^>]*role="switch"[^>]*>/)?.[0]
+    ?? html.match(/<button\b[^>]*aria-checked="(?:true|false)"[^>]*>/)?.[0]
 }
 
 function statValues(html: string): string[] {
@@ -343,6 +365,28 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.icon-container\{[^}]*height:48px/)
   })
 
+  it('links each recent dashboard upload to its video detail page', async () => {
+    const html = await authenticatedFetch('/')
+
+    for (const upload of recentUploads) {
+      // 詳細画面は videoListItems の id で引く。同じ動画なら id を揃える
+      expect(videoListItems.some(video => video.id === upload.id)).toBe(true)
+
+      const href = `${videoListPath}/${upload.id}`
+      const openingTag = firstAnchorWithHref(html, href)
+      expect(openingTag).toBeDefined()
+      expect(html).toMatch(
+        new RegExp(
+          `${escapeRegExp(openingTag!)}[\\s\\S]*?${escapeRegExp(upload.title)}`,
+        ),
+      )
+    }
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.video-row\{[^}]*text-decoration:none/)
+    expect(css).toMatch(/\.video-row\{[^}]*color:inherit/)
+  })
+
   it('renders the video list from mock data with video-list nav active', async () => {
     const html = await authenticatedFetch('/videos')
 
@@ -432,6 +476,7 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(videoDetailTitle)
     expect(html).toContain(cancelButtonLabel)
     expect(html).toContain(saveButtonLabel)
+    expect(html).toContain(deleteButtonLabel)
     expect(html).toContain(titleFieldLabel)
     expect(html).toContain(descriptionFieldLabel)
     expect(html).toContain(visibilitySectionTitle)
@@ -496,11 +541,68 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.screen-video-detail\.page-body\{[^}]*min-width:0/)
     expect(css).toMatch(/\.screen-video-detail\.main-content\{[^}]*overflow-x:visible/)
     expect(css).toMatch(/\.right-pane\{[^}]*min-width:380px/)
-    // 固定幅だと「キャンセル」「変更を保存」が2行・見切れになる
-    expect(css).toMatch(/\.header-cancel,.header-save\{[^}]*width:auto/)
-    expect(css).toMatch(/\.header-cancel,.header-save\{[^}]*white-space:nowrap/)
+    // 固定幅だと「キャンセル」「変更を保存」「削除」が2行・見切れになる
+    expect(css).toMatch(/\.header-cancel,.header-delete,.header-save\{[^}]*width:auto/)
+    expect(css).toMatch(/\.header-cancel,.header-delete,.header-save\{[^}]*white-space:nowrap/)
     expect(css).toMatch(/\.copy-btn\{[^}]*width:auto/)
     expect(css).toMatch(/\.copy-btn\{[^}]*white-space:nowrap/)
+  })
+
+  it('renders the video detail delete confirmation dialog and publish toggle from mock data', async () => {
+    const publishedVideo = videoListItems[0]
+    const unpublishedVideo = videoListItems.find(video => video.status === 'unpublished')
+    expect(publishedVideo.status).toBe('published')
+    expect(unpublishedVideo).toBeDefined()
+
+    const html = await authenticatedFetch(`/videos/${publishedVideo.id}`)
+    const unpublishedHtml = await authenticatedFetch(`/videos/${unpublishedVideo!.id}`)
+
+    const headerActions = headerActionsHtml(html)
+    expect(headerActions).toContain(deleteButtonLabel)
+    expect(headerActions).toMatch(
+      new RegExp(`<button[^>]*>[\\s\\S]*?${escapeRegExp(deleteButtonLabel)}`),
+    )
+
+    expect(html).toMatch(/role="dialog"/)
+    expect(html).toContain(deleteConfirmTitle)
+    expect(html).toContain(deleteConfirmMessage)
+    expect(html).toContain(deleteConfirmOkLabel)
+    expect(html).toContain(deleteConfirmCancelLabel)
+
+    const overlayTag = elementOpeningTag(html, 'delete-dialog-overlay')
+    expect(overlayTag).toBeDefined()
+    expect(overlayTag).toMatch(/\bhidden\b/)
+
+    const dialog = dialogHtml(html)
+    expect(dialog).toContain(deleteConfirmTitle)
+    expect(dialog).toContain(deleteConfirmOkLabel)
+    expect(dialog).toContain(deleteConfirmCancelLabel)
+    expect(dialog).toMatch(
+      new RegExp(`<button[^>]*>[\\s\\S]*?${escapeRegExp(deleteConfirmCancelLabel)}`),
+    )
+    expect(dialog).toMatch(
+      new RegExp(`<button[^>]*>[\\s\\S]*?${escapeRegExp(deleteConfirmOkLabel)}`),
+    )
+
+    const publishedSwitch = switchButtonOpeningTag(html)
+    expect(publishedSwitch).toBeDefined()
+    expect(publishedSwitch).toContain('role="switch"')
+    expect(publishedSwitch).toContain('aria-checked="true"')
+    expect(publishedSwitch).toContain(`aria-label="${publishToggleLabel}"`)
+
+    const unpublishedSwitch = switchButtonOpeningTag(unpublishedHtml)
+    expect(unpublishedSwitch).toBeDefined()
+    expect(unpublishedSwitch).toContain('role="switch"')
+    expect(unpublishedSwitch).toContain('aria-checked="false"')
+    expect(unpublishedHtml).toContain(`badge-${unpublishedVideo!.status}`)
+    expect(unpublishedHtml).toContain(videoStatusLabel[unpublishedVideo!.status])
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.delete-dialog-overlay\{[^}]*position:fixed/)
+    expect(css).toMatch(/\.delete-dialog-overlay\[hidden\]\{[^}]*display:none/)
+    expect(css).toMatch(/\.header-cancel,.header-delete,.header-save\{[^}]*white-space:nowrap/)
+    expect(css).toMatch(/\.header-delete\{[^}]*cursor:pointer/)
+    expect(css).toMatch(/\.toggle-switch\{[^}]*cursor:pointer/)
   })
 
   it('renders the upload screen from mock data with upload nav active', async () => {

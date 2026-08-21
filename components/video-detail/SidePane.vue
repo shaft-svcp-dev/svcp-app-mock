@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { videoStatusLabel, type VideoStatus } from '~/mocks/dashboard'
 import type { VideoListItem } from '~/mocks/videos'
-import { videoStatusLabel } from '~/mocks/dashboard'
 import {
   copyButtonLabel,
   copySuccessLabel,
@@ -14,6 +14,13 @@ import {
 const props = defineProps<{
   video: VideoListItem
 }>()
+
+// バッジ表示もトグルに追従させるため、レコードの status ではなく画面のローカル状態を使う
+const status = defineModel<VideoStatus>('status', { required: true })
+
+function togglePublish() {
+  status.value = status.value === 'published' ? 'unpublished' : 'published'
+}
 
 const [statusRowLabel, durationRowLabel, uploadedAtRowLabel, fileSizeRowLabel]
   = metadataRowLabels
@@ -49,15 +56,17 @@ onUnmounted(() => {
       </h2>
       <div class="toggle-row">
         <span class="toggle-label">{{ publishToggleLabel }}</span>
-        <div
+        <button
           class="toggle-switch"
-          :class="{ 'toggle-switch-on': video.status === 'published' }"
+          :class="{ 'toggle-switch-on': status === 'published' }"
+          type="button"
           role="switch"
-          :aria-checked="video.status === 'published'"
+          :aria-checked="status === 'published'"
           :aria-label="publishToggleLabel"
+          @click="togglePublish"
         >
           <span class="switch-thumb" />
-        </div>
+        </button>
       </div>
     </section>
     <div class="pane-divider" />
@@ -86,8 +95,8 @@ onUnmounted(() => {
       <div class="meta-rows">
         <div class="meta-row">
           <span class="meta-label">{{ statusRowLabel }}</span>
-          <div class="badge" :class="`badge-${video.status}`">
-            <span class="badge-label">{{ videoStatusLabel[video.status] }}</span>
+          <div class="badge" :class="`badge-${status}`">
+            <span class="badge-label">{{ videoStatusLabel[status] }}</span>
           </div>
         </div>
         <div class="meta-row">

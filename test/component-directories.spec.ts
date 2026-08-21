@@ -76,6 +76,7 @@ describe('component directories', () => {
 
   it('places video detail page components in components/video-detail', () => {
     expect(fileNames(videoDetailComponents).sort()).toEqual([
+      'DeleteDialog.vue',
       'MetaInputs.vue',
       'Player.vue',
       'SidePane.vue',
@@ -105,6 +106,8 @@ describe('component directories', () => {
     expect(source).toContain("~/components/video-detail/Player.vue")
     expect(source).toContain("~/components/video-detail/MetaInputs.vue")
     expect(source).toContain("~/components/video-detail/SidePane.vue")
+    expect(source).toContain("~/components/video-detail/DeleteDialog.vue")
+    expect(source).toContain('navigateTo(videoListPath)')
   })
 
   it('imports upload components from the upload page', () => {

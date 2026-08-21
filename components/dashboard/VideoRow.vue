@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { RecentUpload } from '~/mocks/dashboard'
-import { videoStatusLabel } from '~/mocks/dashboard'
+import { videoListPath, videoStatusLabel } from '~/mocks/dashboard'
 
 defineProps<{
   upload: RecentUpload
@@ -8,7 +8,10 @@ defineProps<{
 </script>
 
 <template>
-  <article class="video-row">
+  <NuxtLink
+    class="video-row"
+    :to="`${videoListPath}/${upload.id}`"
+  >
     <img
       class="video-thumb"
       :src="upload.thumbnailSrc"
@@ -29,5 +32,5 @@ defineProps<{
     <div class="badge" :class="`badge-${upload.status}`">
       <span class="badge-label">{{ videoStatusLabel[upload.status] }}</span>
     </div>
-  </article>
+  </NuxtLink>
 </template>

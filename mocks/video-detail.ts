@@ -6,6 +6,12 @@
 export const videoDetailTitle = '動画詳細'
 export const cancelButtonLabel = 'キャンセル'
 export const saveButtonLabel = '変更を保存'
+export const deleteButtonLabel = '削除'
+export const deleteConfirmTitle = '削除確認'
+export const deleteConfirmMessage = 'この動画を削除しますか？'
+export const deleteConfirmOkLabel = 'OK'
+// ヘッダーの cancelButtonLabel（一覧へ戻る）と役割が違うため、ダイアログ用に分けておく
+export const deleteConfirmCancelLabel = 'キャンセル'
 export const titleFieldLabel = '動画タイトル'
 export const descriptionFieldLabel = '説明'
 export const visibilitySectionTitle = '公開設定'
