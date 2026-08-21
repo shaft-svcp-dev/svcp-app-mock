@@ -46,6 +46,11 @@ const settingsPage = import.meta.glob('../pages/settings.vue', {
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
+const settingsSources = import.meta.glob('../components/settings/*.vue', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
 const composableSources = import.meta.glob('../composables/*.ts', {
   eager: true,
   query: '?raw',
@@ -74,6 +79,14 @@ const routeSources = import.meta.glob('../routes.ts', {
 
 function fileNames(modules: Record<string, unknown>): string[] {
   return Object.keys(modules).map(path => path.split('/').at(-1) ?? path)
+}
+
+function expectLiveImport(source: string | undefined, modulePath: string) {
+  // コメント行に残ったパスでは自動解決されない。行頭の import だけを契約する
+  expect(source).toBeDefined()
+  expect(source).toMatch(
+    new RegExp(`^import .+'${modulePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`, 'm'),
+  )
 }
 
 describe('component directories', () => {
@@ -136,12 +149,12 @@ describe('component directories', () => {
     // 動的ルートでは自動解決がページ変換に乗らず本体が空になることがあるため、明示 import を契約する
     const source = Object.entries(videoPages).find(([path]) => path.includes('[id]'))?.[1]
     expect(source).toBeDefined()
-    expect(source).toContain("~/components/video-detail/Player.vue")
-    expect(source).toContain("~/components/video-detail/MetaInputs.vue")
-    expect(source).toContain("~/components/video-detail/SidePane.vue")
-    expect(source).toContain("~/components/video-detail/DeleteDialog.vue")
-    expect(source).toContain("~/components/video-detail/ThumbnailSettings.vue")
-    expect(source).toContain("~/components/video-detail/SubtitleSettings.vue")
+    expectLiveImport(source, '~/components/video-detail/Player.vue')
+    expectLiveImport(source, '~/components/video-detail/MetaInputs.vue')
+    expectLiveImport(source, '~/components/video-detail/SidePane.vue')
+    expectLiveImport(source, '~/components/video-detail/DeleteDialog.vue')
+    expectLiveImport(source, '~/components/video-detail/ThumbnailSettings.vue')
+    expectLiveImport(source, '~/components/video-detail/SubtitleSettings.vue')
     expect(source).toContain('navigateTo(videoListPath)')
   })
 
@@ -186,9 +199,9 @@ describe('component directories', () => {
     // ページ名 Upload と prefix Upload* が重なると自動解決が乗らず、SSRとクライアントが食い違う
     const source = Object.values(uploadPage)[0]
     expect(source).toBeDefined()
-    expect(source).toContain("~/components/upload/DropZone.vue")
-    expect(source).toContain("~/components/upload/ConversionPipeline.vue")
-    expect(source).toContain("~/components/upload/FileInfo.vue")
+    expectLiveImport(source, '~/components/upload/DropZone.vue')
+    expectLiveImport(source, '~/components/upload/ConversionPipeline.vue')
+    expectLiveImport(source, '~/components/upload/FileInfo.vue')
   })
 
   it('places login page components in components/login', () => {
@@ -203,9 +216,9 @@ describe('component directories', () => {
     // ページ名 Login と prefix Login* が重なると自動解決が乗らず、SSRとクライアントが食い違う
     const source = Object.values(loginPage)[0]
     expect(source).toBeDefined()
-    expect(source).toContain("~/components/login/Branding.vue")
-    expect(source).toContain("~/components/login/FormFields.vue")
-    expect(source).toContain("~/components/login/Submit.vue")
+    expectLiveImport(source, '~/components/login/Branding.vue')
+    expectLiveImport(source, '~/components/login/FormFields.vue')
+    expectLiveImport(source, '~/components/login/Submit.vue')
     expect(source).toContain('layout: false')
   })
 
@@ -222,10 +235,10 @@ describe('component directories', () => {
     // ページ名 Signup と prefix Signup* が重なると自動解決が乗らず、SSRとクライアントが食い違う
     const source = Object.values(signupPage)[0]
     expect(source).toBeDefined()
-    expect(source).toContain("~/components/signup/Branding.vue")
-    expect(source).toContain("~/components/signup/FormFields.vue")
-    expect(source).toContain("~/components/signup/TermsConsent.vue")
-    expect(source).toContain("~/components/signup/Submit.vue")
+    expectLiveImport(source, '~/components/signup/Branding.vue')
+    expectLiveImport(source, '~/components/signup/FormFields.vue')
+    expectLiveImport(source, '~/components/signup/TermsConsent.vue')
+    expectLiveImport(source, '~/components/signup/Submit.vue')
     expect(source).toContain('layout: false')
   })
 
@@ -241,9 +254,9 @@ describe('component directories', () => {
     // ページ名 PasswordReset と prefix PasswordReset* が重なると自動解決が乗らず、SSRとクライアントが食い違う
     const source = Object.entries(passwordResetPages).find(([path]) => path.endsWith('index.vue'))?.[1]
     expect(source).toBeDefined()
-    expect(source).toContain("~/components/password-reset/Branding.vue")
-    expect(source).toContain("~/components/password-reset/FormFields.vue")
-    expect(source).toContain("~/components/password-reset/Submit.vue")
+    expectLiveImport(source, '~/components/password-reset/Branding.vue')
+    expectLiveImport(source, '~/components/password-reset/FormFields.vue')
+    expectLiveImport(source, '~/components/password-reset/Submit.vue')
     expect(source).toContain('layout: false')
     expect(source).toContain('navigateTo(passwordResetSentPath)')
   })
@@ -271,17 +284,26 @@ describe('component directories', () => {
     // ページ名 Settings と prefix Settings* が重なると自動解決が乗らず、SSRとクライアントが食い違う
     const source = Object.values(settingsPage)[0]
     expect(source).toBeDefined()
-    expect(source).toContain("~/components/settings/AccountInfo.vue")
-    expect(source).toContain("~/components/settings/DeleteDialog.vue")
-    expect(source).toContain("~/components/settings/MembershipStatus.vue")
-    expect(source).toContain("~/components/settings/PaymentForm.vue")
-    expect(source).toContain("~/components/settings/PaymentCompleteDialog.vue")
+    expectLiveImport(source, '~/components/settings/AccountInfo.vue')
+    expectLiveImport(source, '~/components/settings/DeleteDialog.vue')
+    expectLiveImport(source, '~/components/settings/MembershipStatus.vue')
+    expectLiveImport(source, '~/components/settings/PaymentForm.vue')
+    expectLiveImport(source, '~/components/settings/PaymentCompleteDialog.vue')
     expect(source).toContain('registeredAccount')
     expect(source).toContain('maskEmail')
     expect(source).toContain('authenticated.value = null')
     expect(source).toContain('navigateTo(loginPath)')
     expect(source).toContain('markPaid')
     expect(source).toContain('paymentCompleteOpen')
+  })
+
+  it('keeps settings payment form card fields as live local state', () => {
+    const source = Object.entries(settingsSources).find(([path]) => path.includes('PaymentForm'))?.[1]
+    expect(source).toBeDefined()
+    expect(source).toMatch(/^const cardNumber = ref\(''\)$/m)
+    expect(source).toMatch(/^const cardExpiry = ref\(''\)$/m)
+    expect(source).toMatch(/^const cardCvc = ref\(''\)$/m)
+    expect(source).toMatch(/^const cardHolder = ref\(''\)$/m)
   })
 
   it('gates video delete and multi-file upload on paid membership', () => {
