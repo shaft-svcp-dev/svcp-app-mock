@@ -38,11 +38,15 @@ body {
   align-items: flex-start;
   padding: 24px 16px;
   width: 260px;
-  height: 100%;
+  /* 親 min-height:1024px に stretch すると、低いビューポートでフッターが画面外へ出る */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  max-height: 100vh;
   background: #ffffff;
   border-right: 1px solid #e2e8f0;
   flex: none;
-  align-self: stretch;
+  align-self: flex-start;
 }
 
 .sidebar-top {
@@ -121,6 +125,14 @@ body {
   gap: 12px;
   width: 100%;
   border-top: 1px solid #e2e8f0;
+}
+
+.avatar-link {
+  display: flex;
+  flex: none;
+  line-height: 0;
+  border-radius: 20px;
+  text-decoration: none;
 }
 
 .avatar {

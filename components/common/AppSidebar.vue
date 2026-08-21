@@ -54,11 +54,16 @@ function isActiveNav(to: string): boolean {
       </nav>
     </div>
     <div class="sidebar-footer">
-      <img
-        class="avatar"
-        :src="dashboardUser.avatarSrc"
-        :alt="dashboardUser.avatarAlt"
+      <NuxtLink
+        class="avatar-link"
+        :to="navPath('settings')"
       >
+        <img
+          class="avatar"
+          :src="dashboardUser.avatarSrc"
+          :alt="dashboardUser.avatarAlt"
+        >
+      </NuxtLink>
       <div class="user-meta">
         <span class="user-name">{{ dashboardUser.name }}</span>
         <span class="user-role">{{ dashboardUser.role }}</span>

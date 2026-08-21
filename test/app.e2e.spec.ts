@@ -210,6 +210,25 @@ function membershipStatusHtml(html: string): string {
   return html.match(/<section[^>]*class="[^"]*\bmembership-status\b[^"]*"[^>]*>[\s\S]*?<\/section>/)?.[0] ?? ''
 }
 
+function enclosingAnchorOpeningTag(html: string, className: string): string | undefined {
+  const imgMatch = html.match(
+    new RegExp(`<img\\b[^>]*\\bclass="[^"]*\\b${escapeRegExp(className)}\\b[^"]*"[^>]*>`),
+  )
+  if (!imgMatch || imgMatch.index === undefined) {
+    return undefined
+  }
+
+  const before = html.slice(0, imgMatch.index)
+  const lastAnchor = before.lastIndexOf('<a')
+  const lastCloseAnchor = before.lastIndexOf('</a>')
+  if (lastAnchor < 0 || lastAnchor < lastCloseAnchor) {
+    return undefined
+  }
+
+  const tagEnd = html.indexOf('>', lastAnchor)
+  return html.slice(lastAnchor, tagEnd + 1)
+}
+
 describe('SVCP mock screens', async () => {
   await setup({
     rootDir: '.',
@@ -418,6 +437,21 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.stat-card\{[^}]*color:inherit/)
     expect(css).toMatch(/\.icon-container\{[^}]*width:48px/)
     expect(css).toMatch(/\.icon-container\{[^}]*height:48px/)
+  })
+
+  it('links the sidebar user avatar to settings and pins the sidebar to the viewport', async () => {
+    const html = await fetchPage('/')
+    const avatarLink = enclosingAnchorOpeningTag(html, 'avatar')
+
+    expect(html).toContain(dashboardUser.avatarSrc)
+    expect(avatarLink).toBeDefined()
+    expect(avatarLink).toContain(`href="${settingsPath}"`)
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    // Keep the footer at the viewport bottom even when the screen min-height is 1024px
+    expect(css).toMatch(/\.sidebar\{[^}]*position:sticky/)
+    expect(css).toMatch(/\.sidebar\{[^}]*top:0/)
+    expect(css).toMatch(/\.sidebar\{[^}]*height:100vh/)
   })
 
   it('links each recent dashboard upload to its video detail page', async () => {
