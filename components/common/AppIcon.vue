@@ -20,6 +20,9 @@ export type AppIconName =
   | 'user'
   | 'mail'
   | 'lock'
+  | 'image'
+  | 'captions'
+  | 'trash-2'
 
 defineProps<{
   name: AppIconName
@@ -138,6 +141,22 @@ defineProps<{
     <template v-else-if="name === 'lock'">
       <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </template>
+    <template v-else-if="name === 'image'">
+      <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+      <circle cx="9" cy="9" r="2" />
+      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+    </template>
+    <template v-else-if="name === 'captions'">
+      <rect width="18" height="14" x="3" y="5" rx="2" ry="2" />
+      <path d="M7 15h4M15 15h2M7 11h2M13 11h4" />
+    </template>
+    <template v-else-if="name === 'trash-2'">
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+      <line x1="10" x2="10" y1="11" y2="17" />
+      <line x1="14" x2="14" y1="11" y2="17" />
     </template>
   </svg>
 </template>

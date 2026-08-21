@@ -4,12 +4,15 @@ import VideoDetailDeleteDialog from '~/components/video-detail/DeleteDialog.vue'
 import VideoDetailMetaInputs from '~/components/video-detail/MetaInputs.vue'
 import VideoDetailPlayer from '~/components/video-detail/Player.vue'
 import VideoDetailSidePane from '~/components/video-detail/SidePane.vue'
+import VideoDetailSubtitleSettings from '~/components/video-detail/SubtitleSettings.vue'
+import VideoDetailThumbnailSettings from '~/components/video-detail/ThumbnailSettings.vue'
 import { productName, videoListPath } from '~/mocks/dashboard'
 import {
   cancelButtonLabel,
   deleteButtonLabel,
   saveButtonLabel,
   videoDetailTitle,
+  type VideoSubtitleTrack,
 } from '~/mocks/video-detail'
 import { videoListItems } from '~/mocks/videos'
 
@@ -33,8 +36,10 @@ useHead({
 
 const title = ref(video.title)
 const description = ref(video.description)
-// タイトル・説明と同じく、公開状態は詳細画面のローカル UI 状態。モック配列は更新しない
+// タイトル・説明と同じく、公開・サムネイル・字幕は詳細画面のローカル UI 状態。モック配列は更新しない
 const status = ref(video.status)
+const thumbnailSrc = ref(video.thumbnailSrc)
+const subtitles = ref<VideoSubtitleTrack[]>([])
 const deleteDialogOpen = ref(false)
 
 function openDeleteDialog() {
@@ -67,7 +72,19 @@ async function confirmDelete() {
   </AppHeader>
   <div class="page-body">
     <div class="left-pane">
-      <VideoDetailPlayer :video="video" />
+      <VideoDetailPlayer
+        :video="video"
+        :poster-src="thumbnailSrc"
+        :subtitles="subtitles"
+      />
+      <div class="media-settings-row">
+        <VideoDetailThumbnailSettings
+          v-model:src="thumbnailSrc"
+          :original-src="video.thumbnailSrc"
+          :alt="video.thumbnailAlt"
+        />
+        <VideoDetailSubtitleSettings v-model="subtitles" />
+      </div>
       <VideoDetailMetaInputs
         v-model:title="title"
         v-model:description="description"

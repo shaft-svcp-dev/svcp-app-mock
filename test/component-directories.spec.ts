@@ -86,6 +86,8 @@ describe('component directories', () => {
       'MetaInputs.vue',
       'Player.vue',
       'SidePane.vue',
+      'SubtitleSettings.vue',
+      'ThumbnailSettings.vue',
     ])
   })
 
@@ -113,7 +115,37 @@ describe('component directories', () => {
     expect(source).toContain("~/components/video-detail/MetaInputs.vue")
     expect(source).toContain("~/components/video-detail/SidePane.vue")
     expect(source).toContain("~/components/video-detail/DeleteDialog.vue")
+    expect(source).toContain("~/components/video-detail/ThumbnailSettings.vue")
+    expect(source).toContain("~/components/video-detail/SubtitleSettings.vue")
     expect(source).toContain('navigateTo(videoListPath)')
+  })
+
+  it('keeps thumbnail and subtitle settings as local UI state on the detail page', () => {
+    const pageSource = Object.entries(videoPages).find(([path]) => path.includes('[id]'))?.[1]
+    const thumbnailSource = Object.entries(videoDetailSources).find(([path]) => {
+      return path.includes('ThumbnailSettings')
+    })?.[1]
+    const subtitleSource = Object.entries(videoDetailSources).find(([path]) => {
+      return path.includes('SubtitleSettings')
+    })?.[1]
+    const playerSource = Object.entries(videoDetailSources).find(([path]) => {
+      return path.includes('Player')
+    })?.[1]
+
+    expect(pageSource).toBeDefined()
+    expect(thumbnailSource).toBeDefined()
+    expect(subtitleSource).toBeDefined()
+    expect(playerSource).toBeDefined()
+
+    expect(pageSource).toContain('thumbnailSrc')
+    expect(pageSource).toContain('subtitles')
+    expect(thumbnailSource).toContain('URL.createObjectURL')
+    expect(thumbnailSource).toContain('originalSrc')
+    expect(subtitleSource).toContain('subtitleLanguageOptions')
+    expect(subtitleSource).toContain('subtitleEmptyMessage')
+    expect(subtitleSource).toContain('URL.createObjectURL')
+    expect(playerSource).toContain('kind="subtitles"')
+    expect(playerSource).toContain('<track')
   })
 
   it('imports upload components from the upload page', () => {

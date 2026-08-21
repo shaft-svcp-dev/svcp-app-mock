@@ -2,6 +2,7 @@
  * UIモック。API未接続のため、画面表示専用の固定データ。
  * ラベルは Figma `screen-video-detail` のテキスト幅（CJK 1em）から取る。
  * レコード値（タイトル、説明、ストリームURL、メタデータ）は動画一覧の該当行を使う。
+ * サムネイル・字幕の項目名は Figma に無い設定ブロック用の画面コピー。
  */
 export const videoDetailTitle = '動画詳細'
 export const cancelButtonLabel = 'キャンセル'
@@ -29,4 +30,33 @@ export const metadataRowLabels: readonly string[] = [
   '再生時間',
   'アップロード日',
   'ファイルサイズ',
+]
+
+export interface VideoSubtitleTrack {
+  id: string
+  filename: string
+  src: string
+  srclang: string
+  label: string
+}
+
+export const thumbnailSectionTitle = 'サムネイル設定'
+export const thumbnailUploadLabel = '画像を選択'
+export const thumbnailResetLabel = '元の画像に戻す'
+export const thumbnailHint = 'PNG・JPEG・WebPを設定できます。'
+export const thumbnailFileAccept = 'image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp'
+
+export const subtitleSectionTitle = '字幕設定'
+export const subtitleUploadLabel = '字幕ファイルを追加'
+export const subtitleEmptyMessage = '字幕ファイルはまだ追加されていません'
+export const subtitleRemoveLabel = '削除'
+export const subtitleHint = 'WebVTT（.vtt）を追加すると、プレーヤーで字幕を選べます。'
+export const subtitleFileAccept = '.vtt,text/vtt'
+export const subtitleLanguageFieldLabel = '言語'
+export const subtitleLanguageOptions: readonly {
+  value: string
+  label: string
+}[] = [
+  { value: 'ja', label: '日本語' },
+  { value: 'en', label: '英語' },
 ]

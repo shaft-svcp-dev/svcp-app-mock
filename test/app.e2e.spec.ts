@@ -45,6 +45,17 @@ import {
   publishToggleLabel,
   saveButtonLabel,
   streamUrlSectionTitle,
+  subtitleEmptyMessage,
+  subtitleFileAccept,
+  subtitleHint,
+  subtitleLanguageOptions,
+  subtitleSectionTitle,
+  subtitleUploadLabel,
+  thumbnailFileAccept,
+  thumbnailHint,
+  thumbnailResetLabel,
+  thumbnailSectionTitle,
+  thumbnailUploadLabel,
   titleFieldLabel,
   videoDetailTitle,
   videoPlaybackSrc,
@@ -619,6 +630,52 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.header-cancel,.header-delete,.header-save\{[^}]*white-space:nowrap/)
     expect(css).toMatch(/\.header-delete\{[^}]*cursor:pointer/)
     expect(css).toMatch(/\.toggle-switch\{[^}]*cursor:pointer/)
+  })
+
+  it('renders thumbnail and subtitle settings from the video record without placeholder tracks', async () => {
+    const video = videoListItems[0]
+    const html = await authenticatedFetch(`/videos/${video.id}`)
+    const otherVideo = videoListItems[1]
+    const otherHtml = await authenticatedFetch(`/videos/${otherVideo.id}`)
+
+    expect(html).toContain(thumbnailSectionTitle)
+    expect(html).toContain(thumbnailUploadLabel)
+    expect(html).toContain(thumbnailResetLabel)
+    expect(html).toContain(thumbnailHint)
+    expect(html).toContain(thumbnailFileAccept)
+    expect(html).toContain(subtitleSectionTitle)
+    expect(html).toContain(subtitleUploadLabel)
+    expect(html).toContain(subtitleEmptyMessage)
+    expect(html).toContain(subtitleHint)
+    expect(html).toContain(subtitleFileAccept)
+
+    const preview = elementOpeningTag(html, 'thumbnail-preview')
+    expect(preview).toBeDefined()
+    expect(preview).toContain(`src="${video.thumbnailSrc}"`)
+    expect(preview).toContain(`alt="${video.thumbnailAlt}"`)
+
+    const videoTag = html.match(/<video\b[^>]*>/)?.[0]
+    expect(videoTag).toBeDefined()
+    expect(videoTag).toContain(`poster="${video.thumbnailSrc}"`)
+    expect(html).not.toMatch(/<track\b/)
+
+    const resetButton = elementOpeningTag(html, 'thumbnail-reset')
+    expect(resetButton).toBeDefined()
+    expect(resetButton).toMatch(/\bdisabled\b/)
+
+    expect(otherHtml).toContain(otherVideo.thumbnailSrc)
+    expect(otherHtml).toContain(otherVideo.thumbnailAlt)
+    expect(otherHtml).not.toContain(video.thumbnailSrc)
+
+    expect(subtitleLanguageOptions.map(option => option.value)).toEqual(['ja', 'en'])
+    expect(
+      videoListItems.every(item => !('subtitles' in item) && !('subtitleTracks' in item)),
+    ).toBe(true)
+
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+    expect(css).toMatch(/\.media-settings-row\{[^}]*flex-direction:row/)
+    expect(css).toMatch(/\.thumbnail-preview\{[^}]*aspect-ratio:16\/9/)
+    expect(css).toMatch(/\.file-input-hidden\{[^}]*position:absolute/)
   })
 
   it('renders the upload screen from mock data with upload nav active', async () => {
