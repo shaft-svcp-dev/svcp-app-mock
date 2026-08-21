@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { logoutButtonLabel, uploadButtonLabel } from '~/mocks/dashboard'
+import { logoutButtonLabel, uploadButtonLabel } from '~/constants/dashboard'
+import { loginPath, uploadPath } from '~/routes'
 
 const authenticated = useAuthStorage()
 
 async function onLogout() {
   authenticated.value = null
-  await navigateTo('/login')
+  await navigateTo(loginPath)
 }
 </script>
 
 <template>
-  <NuxtLink class="btn header-upload" to="/upload">
+  <NuxtLink class="btn header-upload" :to="uploadPath">
     <AppIcon name="plus" :size="16" />
     <span class="btn-label">{{ uploadButtonLabel }}</span>
   </NuxtLink>

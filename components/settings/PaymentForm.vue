@@ -11,14 +11,13 @@ import {
   payButtonLabel,
   paymentSectionDescription,
   paymentSectionTitle,
-} from '~/mocks/settings'
+} from '~/constants/settings'
 
 const emit = defineEmits<{
   pay: []
 }>()
 
-// 見た目用の入力。決済APIへは送らず、支払いボタンは完了ダイアログだけ出す
-const cardNumber = ref('')
+// 見た目用の入力。決渁EPIへは送らず、支払いボタンは完亁E��イアログだけ�EぁEconst cardNumber = ref('')
 const cardExpiry = ref('')
 const cardCvc = ref('')
 const cardHolder = ref('')

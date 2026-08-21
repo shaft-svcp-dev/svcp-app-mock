@@ -1,5 +1,4 @@
 import type { VideoStatus } from './dashboard'
-import { videoStatusLabel } from './dashboard'
 
 export type VideoListStatusFilter = 'all' | VideoStatus
 
@@ -34,28 +33,6 @@ export function excludeDeletedVideos<T extends { id: string }>(
   const deleted = new Set(deletedIds)
   return videos.filter(video => !deleted.has(video.id))
 }
-
-export const videoListTitle = '動画一覧'
-export const searchPlaceholder = '動画を検索'
-export const sortButtonLabel = 'アップロード日時'
-
-export const statusFilterOptions: readonly {
-  value: VideoListStatusFilter
-  label: string
-}[] = [
-  { value: 'all', label: 'すべてのステータス' },
-  { value: 'published', label: videoStatusLabel.published },
-  { value: 'unpublished', label: videoStatusLabel.unpublished },
-]
-
-export const videoTableColumns: readonly { id: string, label: string }[] = [
-  { id: 'thumbnail', label: 'サムネイル' },
-  { id: 'title', label: 'タイトル' },
-  { id: 'duration', label: '再生時間' },
-  { id: 'size', label: 'ファイルサイズ' },
-  { id: 'status', label: 'ステータス' },
-  { id: 'uploadedAt', label: 'アップロード日時' },
-]
 
 /**
  * UIモック。API未接続のため、画面表示専用の固定データ。

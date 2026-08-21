@@ -21,6 +21,8 @@ description: >-
 | ページ | `pages/` | ルートに合わせる（`videos.vue` → `/videos`） | — |
 | レイアウト | `layouts/` | 下記の共有条件を満たすときだけ | — |
 | モック | `mocks/` | 画面ドメイン（`videos.ts`, `dashboard.ts`） | — |
+| 定数（表示文言） | `constants/` | 画面ドメイン（`videos.ts`, `dashboard.ts`） | — |
+| 画面パス | `routes.ts` | — | — |
 | 画面CSS | `assets/css/<画面>.css` | ディレクトリ名（`video-list.css`） | — |
 
 - `components/` 直下に `.vue` を置かない。
@@ -89,10 +91,10 @@ description: >-
 
 ## データと props
 
-- レコード・文言・選択肢は `mocks/` に置く。コンポーネントに表示用の固定文字列や配列を直書きしない。
+- レコード・ストレージキーは `mocks/` に置く。画面名・ボタン・フィールドラベルなど表示文言は `constants/` に置く。画面パスは `routes.ts` に置く。コンポーネントに表示用の固定文字列や配列を直書きしない。
 - レコード配列（`videoListItems`, `dashboardStats`, `recentUploads`）は **ページだけ** が import し、子へ props で渡す。
-- 子が import してよいのは型、ラベル、選択肢、列定義など表示契約（`videoListTitle`, `statusFilterOptions`, `videoTableColumns`, `videoStatusLabel`）。
-- 画面をまたぐ文言（ナビ、ユーザー、ステータスラベル、アップロードボタン）は `mocks/dashboard.ts` を再利用し、複製しない。
+- 子が import してよいのは型、ラベル、選択肢、列定義など表示契約（`videoListTitle`, `statusFilterOptions`, `videoTableColumns`, `videoStatusLabel`）。ラベル類は `constants/` から取る。
+- 画面をまたぐ文言（ナビ、ユーザー表示名以外のステータスラベル、アップロードボタン）は `constants/dashboard.ts` を再利用し、複製しない。
 - 一覧は props（`videos`, `stat`, `upload`）。フィルターなどページが持つ入力は `defineModel`。
 - fetch / store / provide は使わない。ページがモックを読み、派生データを計算する。
 
@@ -107,11 +109,11 @@ description: >-
 
 1. デザインから Header、名前付きブロック、繰り返しカードを洗い出す。迷ったら切り出さない。
 2. `test/component-directories.spec.ts` にディレクトリの glob と期待ファイル名を追加する（直下 `.vue` は空のまま）。
-3. `mocks/<画面>.ts` にデザインどおりのレコードと文言を置く。
+3. `mocks/<画面>.ts` にデザインどおりのレコードを置き、画面名・ラベルは `constants/<画面>.ts` に、画面パスは `routes.ts` に置く。
 4. `nuxt.config.ts` に `components` の `prefix` と `css` を足す。
 5. ページでシェルを組み立て、状態と配列の派生を書く。複数画面が同じ外側の枠を共有する場合のみ `layouts/` に出し、1画面ならページに残す。
 6. 子は表示と入力だけにする。
-7. `test/app.e2e.spec.ts` でページHTMLをモック値に対して検証する。子コンポーネント単体テストは追加しない。
+7. `test/app.e2e.spec.ts` でページHTMLをモックのレコード値、`constants/` の文言、`routes.ts` のパスに対して検証する。子コンポーネント単体テストは追加しない。
 
 ## テスト
 

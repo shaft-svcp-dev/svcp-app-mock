@@ -6,15 +6,16 @@ import VideoDetailPlayer from '~/components/video-detail/Player.vue'
 import VideoDetailSidePane from '~/components/video-detail/SidePane.vue'
 import VideoDetailSubtitleSettings from '~/components/video-detail/SubtitleSettings.vue'
 import VideoDetailThumbnailSettings from '~/components/video-detail/ThumbnailSettings.vue'
-import { productName, videoListPath } from '~/mocks/dashboard'
+import { productName } from '~/constants/dashboard'
 import {
   cancelButtonLabel,
   deleteButtonLabel,
   saveButtonLabel,
   videoDetailTitle,
-  type VideoSubtitleTrack,
-} from '~/mocks/video-detail'
+} from '~/constants/video-detail'
+import type { VideoSubtitleTrack } from '~/mocks/video-detail'
 import { videoListItems } from '~/mocks/videos'
+import { videoListPath } from '~/routes'
 
 definePageMeta({
   screenClass: 'screen-video-detail',
@@ -60,7 +61,7 @@ async function confirmDelete() {
 <template>
   <AppHeader :title="videoDetailTitle">
     <template #actions>
-      <NuxtLink class="btn-outline header-cancel" to="/videos">
+      <NuxtLink class="btn-outline header-cancel" :to="videoListPath">
         <span class="btn-label">{{ cancelButtonLabel }}</span>
       </NuxtLink>
       <button class="btn header-save" type="button">

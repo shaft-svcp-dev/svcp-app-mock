@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { loginLinkLabel, loginPath, signupButtonLabel } from '~/mocks/signup'
+import { loginLinkLabel, signupButtonLabel } from '~/constants/signup'
+import { loginPath } from '~/routes'
 </script>
 
 <template>

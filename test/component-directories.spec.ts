@@ -56,6 +56,21 @@ const middlewareSources = import.meta.glob('../middleware/*.ts', {
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
+const mockSources = import.meta.glob('../mocks/*.ts', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
+const constantSources = import.meta.glob('../constants/*.ts', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
+const routeSources = import.meta.glob('../routes.ts', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>
 
 function fileNames(modules: Record<string, unknown>): string[] {
   return Object.keys(modules).map(path => path.split('/').at(-1) ?? path)
@@ -118,7 +133,7 @@ describe('component directories', () => {
   })
 
   it('imports video-detail components from the dynamic detail page', () => {
-    // 動的ルートでは自動解決がページ変換に乗らず本体が空になることがあるため、明示 import を契約にする
+    // 動的ルートでは自動解決がページ変換に乗らず本体が空になることがあるため、明示 import を契約する
     const source = Object.entries(videoPages).find(([path]) => path.includes('[id]'))?.[1]
     expect(source).toBeDefined()
     expect(source).toContain("~/components/video-detail/Player.vue")
@@ -342,5 +357,44 @@ describe('component directories', () => {
     expect(loginSource).toContain('authStorageValue')
     expect(signupSource).toContain('useAuthStorage')
     expect(signupSource).toContain('authStorageValue')
+  })
+
+  it('keeps screen titles in constants/, routes in routes.ts, and only data in mocks/', () => {
+    expect(fileNames(constantSources).sort()).toEqual([
+      'dashboard.ts',
+      'login.ts',
+      'password-reset.ts',
+      'settings.ts',
+      'signup.ts',
+      'upload.ts',
+      'video-detail.ts',
+      'videos.ts',
+    ])
+
+    const constantsJoined = Object.values(constantSources).join('\n')
+    expect(constantsJoined).toContain('export const loginTitle')
+    expect(constantsJoined).toContain('export const signupTitle')
+    expect(constantsJoined).toContain('export const passwordResetTitle')
+    expect(constantsJoined).toContain('export const settingsTitle')
+    expect(constantsJoined).toContain('export const dashboardTitle')
+    expect(constantsJoined).toContain('export const videoListTitle')
+    expect(constantsJoined).toContain('export const videoDetailTitle')
+
+    const routeJoined = Object.values(routeSources).join('\n')
+    expect(routeJoined).toContain('export const loginPath')
+    expect(routeJoined).toContain('export const signupPath')
+    expect(routeJoined).toContain('export const passwordResetPath')
+    expect(routeJoined).toContain('export const passwordResetSentPath')
+    expect(routeJoined).toContain('export const settingsPath')
+    expect(routeJoined).toContain('export const videoListPath')
+    expect(routeJoined).toContain('export const dashboardPath')
+    expect(routeJoined).toContain('export const uploadPath')
+
+    const constantExportName = /export const \w+(Title|Label|Placeholder|Tagline|Message|Hint|Note|Prompt|Description)\b/
+    const pathExportName = /export const \w+Path\b/
+    for (const [path, source] of Object.entries(mockSources)) {
+      expect(source, path).not.toMatch(constantExportName)
+      expect(source, path).not.toMatch(pathExportName)
+    }
   })
 })

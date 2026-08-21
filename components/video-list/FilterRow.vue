@@ -5,14 +5,14 @@ import {
   sortButtonLabel,
   statusFilterOptions,
   videoTableColumns,
-} from '~/mocks/videos'
+} from '~/constants/videos'
 
 const query = defineModel<string>('query', { required: true })
 const statusFilter = defineModel<VideoListStatusFilter>('statusFilter', { required: true })
 
 const statusFilterAriaLabel = videoTableColumns.find(column => column.id === 'status')?.label
 
-// デザインは「アップロード日時」の降順表示のみ。他の並び替えキーは仕様にない。
+// ??????????????????????????????????????
 </script>
 
 <template>
@@ -46,7 +46,7 @@ const statusFilterAriaLabel = videoTableColumns.find(column => column.id === 'st
     <button
       type="button"
       class="btn-outline sort-button"
-      :aria-label="`${sortButtonLabel}の降順`"
+      :aria-label="`${sortButtonLabel}???`"
     >
       <AppIcon name="sort-desc" :size="16" />
       <span class="sort-button-label">{{ sortButtonLabel }}</span>

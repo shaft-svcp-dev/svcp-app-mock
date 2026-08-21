@@ -3,6 +3,9 @@ import {
   conversionPipelineNote,
   conversionPipelineTitle,
   conversionProgressLabel,
+  conversionStepLabel,
+} from '~/constants/upload'
+import {
   conversionProgressPercent,
   conversionSteps,
 } from '~/mocks/upload'
@@ -40,7 +43,7 @@ import {
               class="step-label"
               :class="{ 'step-label-active': step.status === 'active' }"
             >
-              {{ step.label }}
+              {{ conversionStepLabel[step.id] }}
             </span>
           </div>
           <div

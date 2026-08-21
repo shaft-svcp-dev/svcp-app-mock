@@ -3,10 +3,11 @@ import {
   buildDashboardStats,
   dashboardTitle,
   recentSectionTitle,
-  recentUploads,
   viewAllLabel,
-} from '~/mocks/dashboard'
+} from '~/constants/dashboard'
+import { recentUploads } from '~/mocks/dashboard'
 import { excludeDeletedVideos, videoListItems } from '~/mocks/videos'
+import { videoListPath } from '~/routes'
 
 definePageMeta({
   screenClass: 'screen-dashboard',
@@ -37,7 +38,7 @@ const dashboardStats = computed(() => buildDashboardStats(visibleVideos.value))
         <h2 id="recent-uploads-heading" class="sec-title">
           {{ recentSectionTitle }}
         </h2>
-        <NuxtLink class="view-all-link" to="/videos">
+        <NuxtLink class="view-all-link" :to="videoListPath">
           {{ viewAllLabel }}
         </NuxtLink>
       </div>

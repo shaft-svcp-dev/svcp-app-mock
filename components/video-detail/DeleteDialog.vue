@@ -4,7 +4,7 @@ import {
   deleteConfirmMessage,
   deleteConfirmOkLabel,
   deleteConfirmTitle,
-} from '~/mocks/video-detail'
+} from '~/constants/video-detail'
 
 const open = defineModel<boolean>('open', { required: true })
 
@@ -17,13 +17,12 @@ function cancel() {
 }
 
 function confirm() {
-  // 閉じない。OK 後の一覧遷移はページが担う
-  emit('confirm')
+  // 閉じなぁE��OK 後�E一覧遷移はペ�Eジが担ぁE  emit('confirm')
 }
 </script>
 
 <template>
-  <!-- 閉じているときも DOM に残し、SSR と支援技術からダイアログの役割が分かるようにする -->
+  <!-- 閉じてぁE��ときも DOM に残し、SSR と支援技術からダイアログの役割が�Eかるようにする -->
   <div
     class="delete-dialog-overlay"
     :hidden="!open"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { RecentUpload } from '~/mocks/dashboard'
-import { videoListPath, videoStatusLabel } from '~/mocks/dashboard'
+import { videoStatusLabel } from '~/constants/dashboard'
+import { videoListPath } from '~/routes'
 
 defineProps<{
   upload: RecentUpload

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-// 項目名は登録・ログインと同じ文言を使う。設定画面用に複製しない
-import { emailFieldLabel } from '~/mocks/login'
-import { accountSectionTitle } from '~/mocks/settings'
+// 項目名は登録・ログインと同じ文言を使い、設定画面用に複製しない
+import { emailFieldLabel } from '~/constants/login'
+import { accountSectionTitle } from '~/constants/settings'
 import {
   companyFieldLabel,
   fullNameFieldLabel,
-} from '~/mocks/signup'
+} from '~/constants/signup'
 
 defineProps<{
   companyName: string

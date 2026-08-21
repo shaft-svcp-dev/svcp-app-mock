@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import {
   subtitleEmptyMessage,
-  subtitleFileAccept,
   subtitleHint,
   subtitleLanguageFieldLabel,
   subtitleLanguageOptions,
   subtitleRemoveLabel,
   subtitleSectionTitle,
   subtitleUploadLabel,
+} from '~/constants/video-detail'
+import {
+  subtitleFileAccept,
   type VideoSubtitleTrack,
 } from '~/mocks/video-detail'
 

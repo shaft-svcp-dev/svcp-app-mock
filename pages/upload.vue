@@ -3,12 +3,11 @@
 import UploadConversionPipeline from '~/components/upload/ConversionPipeline.vue'
 import UploadDropZone from '~/components/upload/DropZone.vue'
 import UploadFileInfo from '~/components/upload/FileInfo.vue'
-import { productName, uploadButtonLabel } from '~/mocks/dashboard'
+import { productName, uploadButtonLabel } from '~/constants/dashboard'
+import { freeUploadLimitNote, paidUploadMultipleNote } from '~/constants/upload'
 import {
   formatFileSize,
-  freeUploadLimitNote,
   limitSelectedFiles,
-  paidUploadMultipleNote,
   uploadingFile,
   type UploadingFile,
 } from '~/mocks/upload'

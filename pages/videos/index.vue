@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { productName, videoListStatusQueryParam } from '~/mocks/dashboard'
+import { productName } from '~/constants/dashboard'
+import { videoListTitle } from '~/constants/videos'
 import type { VideoListStatusFilter } from '~/mocks/videos'
 import {
   excludeDeletedVideos,
   videoListItems,
-  videoListTitle,
 } from '~/mocks/videos'
+import { videoListStatusQueryParam } from '~/routes'
 
 definePageMeta({
   screenClass: 'screen-video-list',
@@ -18,7 +19,7 @@ useHead({
 const { deletedIds } = useDeletedVideoIds()
 
 function statusFilterFromQuery(value: unknown): VideoListStatusFilter {
-  // 同一キーの重複は配列。published / unpublished 以外は絞り込みなし
+  // 同一キーの重複配列。published / unpublished 以外は絞り込みなし
   const raw = Array.isArray(value) ? value[0] : value
   if (raw === 'published' || raw === 'unpublished') {
     return raw

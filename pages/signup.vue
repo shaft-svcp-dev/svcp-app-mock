@@ -1,12 +1,12 @@
 <script setup lang="ts">
-// ページ名 Signup と prefix Signup* が重なり、自動解決がページ変換に乗らない
-import SignupBranding from '~/components/signup/Branding.vue'
+// ペ�Eジ吁ESignup と prefix Signup* が重なり、�E動解決が�Eージ変換に乗らなぁEimport SignupBranding from '~/components/signup/Branding.vue'
 import SignupFormFields from '~/components/signup/FormFields.vue'
 import SignupSubmit from '~/components/signup/Submit.vue'
 import SignupTermsConsent from '~/components/signup/TermsConsent.vue'
-import { productName } from '~/mocks/dashboard'
+import { productName } from '~/constants/dashboard'
+import { signupTitle } from '~/constants/signup'
 import { authStorageValue } from '~/mocks/login'
-import { signupTitle } from '~/mocks/signup'
+import { dashboardPath } from '~/routes'
 
 definePageMeta({
   layout: false,
@@ -21,14 +21,13 @@ const fullName = ref('')
 const email = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
-// Figma の checkbox-box は選択済み表示。初期値だけ合わせ、保存はしない
-const termsAgreed = ref(true)
+// Figma の checkbox-box は選択済み表示。�E期値だけ合わせ、保存�EしなぁEconst termsAgreed = ref(true)
 const authenticated = useAuthStorage()
 
 async function onSubmit() {
-  // API 未接続のため入力値は保存せず、登録操作の有無だけを残す
+  // API 未接続�Eため入力値は保存せず、登録操作�E有無だけを残す
   authenticated.value = authStorageValue
-  await navigateTo('/')
+  await navigateTo(dashboardPath)
 }
 </script>
 

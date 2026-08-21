@@ -1,10 +1,10 @@
 <script setup lang="ts">
-// ページ名 PasswordReset と prefix PasswordReset* が重なり、自動解決がページ変換に乗らない
-import PasswordResetBranding from '~/components/password-reset/Branding.vue'
+// ペ�Eジ吁EPasswordReset と prefix PasswordReset* が重なり、�E動解決が�Eージ変換に乗らなぁEimport PasswordResetBranding from '~/components/password-reset/Branding.vue'
 import PasswordResetFormFields from '~/components/password-reset/FormFields.vue'
 import PasswordResetSubmit from '~/components/password-reset/Submit.vue'
-import { productName } from '~/mocks/dashboard'
-import { passwordResetSentPath, passwordResetTitle } from '~/mocks/password-reset'
+import { productName } from '~/constants/dashboard'
+import { passwordResetTitle } from '~/constants/password-reset'
+import { passwordResetSentPath } from '~/routes'
 
 definePageMeta({
   layout: false,
@@ -17,7 +17,7 @@ useHead({
 const email = ref('')
 
 async function onSubmit() {
-  // モックのためメールは送らず、再設定操作の有無だけを画面遷移で残す
+  // モチE��のためメールは送らず、�E設定操作�E有無だけを画面遷移で残す
   await navigateTo(passwordResetSentPath)
 }
 </script>

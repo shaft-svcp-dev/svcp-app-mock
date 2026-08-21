@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { productName } from '~/mocks/dashboard'
+import { productName } from '~/constants/dashboard'
 
 defineProps<{
   title: string

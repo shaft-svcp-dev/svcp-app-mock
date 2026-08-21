@@ -3,7 +3,7 @@ import {
   freeMemberLabel,
   membershipSectionTitle,
   paidMemberLabel,
-} from '~/mocks/settings'
+} from '~/constants/settings'
 
 defineProps<{
   paid: boolean

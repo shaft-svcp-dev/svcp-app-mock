@@ -1,108 +1,36 @@
 import { $fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import {
-  dashboardUser,
+  dashboardNavLabel,
+  dashboardTitle,
   logoutButtonLabel,
+  mainNavAriaLabel,
   productName,
-  recentUploads,
+  recentSectionTitle,
   totalPlayCountStatLabel,
   totalVideosStatLabel,
   uploadButtonLabel,
-  videoListPath,
   videoStatusLabel,
-} from '../mocks/dashboard'
+  viewAllLabel,
+} from '../constants/dashboard'
 import {
-  excludeDeletedVideos,
-  parseDeletedVideoIds,
-  searchPlaceholder,
-  sortButtonLabel,
-  statusFilterOptions,
-  videoListItems,
-  videoListTitle,
-  videoTableColumns,
-} from '../mocks/videos'
-import {
-  conversionPipelineNote,
-  conversionPipelineTitle,
-  conversionProgressLabel,
-  conversionProgressPercent,
-  conversionSteps,
-  dropZoneSubtitle,
-  dropZoneTitle,
-  formatFileSize,
-  freeUploadLimit,
-  freeUploadLimitNote,
-  limitSelectedFiles,
-  paidUploadMultipleNote,
-  selectFileButtonLabel,
-  uploadingFile,
-  videoFileAccept,
-} from '../mocks/upload'
-import {
-  cancelButtonLabel,
-  copyButtonLabel,
-  copySuccessLabel,
-  deleteConfirmMessage,
-  deleteConfirmTitle,
-  descriptionFieldLabel,
-  metadataSectionTitle,
-  metadataRowLabels,
-  publishToggleLabel,
-  saveButtonLabel,
-  streamUrlSectionTitle,
-  subtitleEmptyMessage,
-  subtitleFileAccept,
-  subtitleHint,
-  subtitleLanguageOptions,
-  subtitleSectionTitle,
-  subtitleUploadLabel,
-  thumbnailFileAccept,
-  thumbnailHint,
-  thumbnailResetLabel,
-  thumbnailSectionTitle,
-  thumbnailUploadLabel,
-  titleFieldLabel,
-  videoDetailTitle,
-  videoPlaybackSrc,
-  visibilitySectionTitle,
-} from '../mocks/video-detail'
-import {
-  authStorageValue,
   emailFieldLabel,
   emailPlaceholder,
-  isAuthenticated,
+  forgotPasswordLinkLabel,
+  forgotPasswordPromptLabel,
   loginButtonLabel,
   loginTagline,
   passwordFieldLabel,
   passwordPlaceholder,
-  forgotPasswordLinkLabel,
-  forgotPasswordPromptLabel,
-  loginPath,
-  passwordResetPath,
   signupLinkLabel,
-  signupPath,
   signupPromptLabel,
-} from '../mocks/login'
-import {
-  companyFieldLabel,
-  companyPlaceholder,
-  fullNameFieldLabel,
-  fullNamePlaceholder,
-  loginLinkLabel,
-  passwordConfirmFieldLabel,
-  requiredFieldLabel,
-  signupButtonLabel,
-  signupTagline,
-  signupTitle,
-  termsConsentLabel,
-} from '../mocks/signup'
+} from '../constants/login'
 import {
   loginScreenLinkLabel,
   passwordResetButtonLabel,
-  passwordResetSentPath,
   passwordResetSentTitle,
   passwordResetTitle,
-} from '../mocks/password-reset'
+} from '../constants/password-reset'
 import {
   accountSectionTitle,
   cardCvcFieldLabel,
@@ -116,20 +44,109 @@ import {
   deleteAccountConfirmOkLabel,
   deleteAccountConfirmTitle,
   freeMemberLabel,
-  isPaidMembership,
-  maskEmail,
   membershipSectionTitle,
   paidMemberLabel,
-  paidMembershipValue,
   payButtonLabel,
   paymentCompleteConfirmLabel,
   paymentCompleteTitle,
   paymentSectionDescription,
   paymentSectionTitle,
-  registeredAccount,
-  settingsPath,
   settingsTitle,
+} from '../constants/settings'
+import {
+  companyFieldLabel,
+  companyPlaceholder,
+  fullNameFieldLabel,
+  fullNamePlaceholder,
+  loginLinkLabel,
+  passwordConfirmFieldLabel,
+  requiredFieldLabel,
+  signupButtonLabel,
+  signupTagline,
+  signupTitle,
+  termsConsentLabel,
+} from '../constants/signup'
+import {
+  conversionPipelineNote,
+  conversionPipelineTitle,
+  conversionProgressLabel,
+  conversionStepLabel,
+  dropZoneSubtitle,
+  dropZoneTitle,
+  freeUploadLimitNote,
+  paidUploadMultipleNote,
+  selectFileButtonLabel,
+} from '../constants/upload'
+import {
+  cancelButtonLabel,
+  copyButtonLabel,
+  copySuccessLabel,
+  deleteConfirmMessage,
+  deleteConfirmTitle,
+  descriptionFieldLabel,
+  metadataSectionTitle,
+  metadataRowLabels,
+  publishToggleLabel,
+  saveButtonLabel,
+  streamUrlSectionTitle,
+  subtitleEmptyMessage,
+  subtitleHint,
+  subtitleLanguageOptions,
+  subtitleSectionTitle,
+  subtitleUploadLabel,
+  thumbnailHint,
+  thumbnailResetLabel,
+  thumbnailSectionTitle,
+  thumbnailUploadLabel,
+  titleFieldLabel,
+  videoDetailTitle,
+  visibilitySectionTitle,
+} from '../constants/video-detail'
+import {
+  searchPlaceholder,
+  sortButtonLabel,
+  statusFilterOptions,
+  videoListTitle,
+  videoTableColumns,
+} from '../constants/videos'
+import { dashboardUser, recentUploads } from '../mocks/dashboard'
+import {
+  authStorageValue,
+  isAuthenticated,
+} from '../mocks/login'
+import {
+  isPaidMembership,
+  maskEmail,
+  paidMembershipValue,
+  registeredAccount,
 } from '../mocks/settings'
+import {
+  conversionProgressPercent,
+  conversionSteps,
+  formatFileSize,
+  freeUploadLimit,
+  limitSelectedFiles,
+  uploadingFile,
+  videoFileAccept,
+} from '../mocks/upload'
+import {
+  subtitleFileAccept,
+  thumbnailFileAccept,
+  videoPlaybackSrc,
+} from '../mocks/video-detail'
+import {
+  excludeDeletedVideos,
+  parseDeletedVideoIds,
+  videoListItems,
+} from '../mocks/videos'
+import {
+  loginPath,
+  passwordResetPath,
+  passwordResetSentPath,
+  settingsPath,
+  signupPath,
+  videoListPath,
+} from '../routes'
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -217,7 +234,7 @@ describe('SVCP mock screens', async () => {
     expect(firstAnchorWithHref(html, passwordResetPath)).toBeDefined()
     expect(html.indexOf(signupLinkLabel)).toBeLessThan(html.indexOf(forgotPasswordPromptLabel))
     expect(html).not.toContain(dashboardUser.name)
-    expect(html).not.toContain('メインナビゲーション')
+    expect(html).not.toContain(mainNavAriaLabel)
     expect(html).toMatch(/<input[^>]*type="email"/)
     expect(html).toMatch(/<input[^>]*type="password"/)
 
@@ -252,7 +269,7 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(loginLinkLabel)
     expect(firstAnchorWithHref(html, loginPath)).toBeDefined()
     expect(html).not.toContain(dashboardUser.name)
-    expect(html).not.toContain('メインナビゲーション')
+    expect(html).not.toContain(mainNavAriaLabel)
     expect(html).toMatch(/<input[^>]*type="email"/)
     expect(html).toMatch(/<input[^>]*type="checkbox"/)
     expect((html.match(/<input[^>]*type="password"/g) ?? []).length).toBe(2)
@@ -278,12 +295,12 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(loginScreenLinkLabel)
     expect(firstAnchorWithHref(html, loginPath)).toBeDefined()
     expect(html).not.toContain(dashboardUser.name)
-    expect(html).not.toContain('メインナビゲーション')
+    expect(html).not.toContain(mainNavAriaLabel)
     expect(html).toMatch(/<input[^>]*type="email"/)
     expect(html).not.toMatch(/<input[^>]*type="password"/)
 
     const css = (await stylesheetText(html)).replace(/\s+/g, '')
-    // 入力画面と完了画面でセレクタを共有しているため、クラス名の直後が { とは限らない
+    // å¥åç»é¢ã¨å®äºç»é¢ã§ã»ã¬ã¯ã¿ãå±æãã¦ãããããã¯ã©ã¹åã®ç´å¾ã { ã¨ã¯éããªã
     expect(css).toMatch(/\.screen-password-reset[,{][^}]*justify-content:center/)
     expect(css).toMatch(/\.screen-password-reset[,{][^}]*background:#f8fafc/)
     expect(css).toMatch(/\.password-reset-card\{[^}]*width:440px/)
@@ -298,7 +315,7 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(loginScreenLinkLabel)
     expect(firstAnchorWithHref(html, loginPath)).toBeDefined()
     expect(html).not.toContain(dashboardUser.name)
-    expect(html).not.toContain('メインナビゲーション')
+    expect(html).not.toContain(mainNavAriaLabel)
     expect(html).not.toMatch(/<input[^>]*type="email"/)
 
     const css = (await stylesheetText(html)).replace(/\s+/g, '')
@@ -316,7 +333,7 @@ describe('SVCP mock screens', async () => {
     const sentHtml = await $fetch<string>(passwordResetSentPath)
     const settingsHtml = await $fetch<string>(settingsPath)
 
-    expect(dashboardHtml).toContain('総動画数')
+    expect(dashboardHtml).toContain(totalVideosStatLabel)
     expect(dashboardHtml).toContain(dashboardUser.name)
     expect(signupHtml).toContain(signupTitle)
     expect(signupHtml).toContain(companyFieldLabel)
@@ -329,15 +346,15 @@ describe('SVCP mock screens', async () => {
   it('renders the dashboard chrome, stats, and recent uploads from mock data', async () => {
     const html = await fetchPage('/')
 
-    expect(html).toContain('SVCP')
+    expect(html).toContain(productName)
     expect(html).not.toContain('VideoHub')
-    expect(html).toContain('ダッシュボード')
-    expect(html).toContain('動画一覧')
-    expect(html).toContain('アップロード')
-    expect(html).toContain('設定')
-    expect(html).toContain('田中 太郎')
-    expect(html).toContain('プロダクトマネージャー')
-    expect(html).toContain('動画をアップロード')
+    expect(html).toContain(dashboardTitle)
+    expect(html).toContain(dashboardNavLabel['video-list'])
+    expect(html).toContain(dashboardNavLabel.upload)
+    expect(html).toContain(dashboardNavLabel.settings)
+    expect(html).toContain(dashboardUser.name)
+    expect(html).toContain(dashboardUser.role)
+    expect(html).toContain(uploadButtonLabel)
     expect(html).toContain(logoutButtonLabel)
 
     const headerActions = headerActionsHtml(html)
@@ -370,13 +387,13 @@ describe('SVCP mock screens', async () => {
     )
     expect(statCardByLabel(html, totalPlayCountStatLabel)).toMatch(/^<article\b/)
     expect(statCardByLabel(html, totalPlayCountStatLabel)).not.toMatch(/href=/)
-    expect(html).toContain('最近のアップロード')
-    expect(html).toContain('すべて見る')
-    expect(html).toContain('製品UIデモ：ダッシュボード操作説明')
-    expect(html).toContain('社内研修：アーキテクチャ解説セッション')
-    expect(html).toContain('ブランドムービー：夕暮れの山並み')
-    expect(html).toContain('再生時間 12:48')
-    expect(html).toContain('ファイルサイズ 245.8MB')
+    expect(html).toContain(recentSectionTitle)
+    expect(html).toContain(viewAllLabel)
+    for (const upload of recentUploads) {
+      expect(html).toContain(upload.title)
+      expect(html).toContain(upload.duration)
+      expect(html).toContain(upload.size)
+    }
     expect(html).not.toContain('Nuxt セットアップ完了')
 
     const dashboardNav = firstAnchorWithHref(html, '/')
@@ -389,7 +406,7 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.header\{[^}]*padding:20px32px/)
     expect(css).toMatch(/\.header\{[^}]*height:77px/)
     expect(css).toMatch(/\.header-actions\{[^}]*gap:16px/)
-    // Figma のアップロードボタンは 168×37。CJK ではみ出さない内容幅にする
+    // Figma ã®ã¢ããã­ã¼ããã¿ã³ã¯ 168Ã37ãCJK ã§ã¯ã¿åºããªãåå®¹å¹ã«ãã
     expect(css).toMatch(/\.header-upload\{[^}]*min-width:168px/)
     expect(css).toMatch(/\.header-upload\{[^}]*height:37px/)
     expect(css).toMatch(/\.header-upload\{[^}]*white-space:nowrap/)
@@ -407,7 +424,7 @@ describe('SVCP mock screens', async () => {
     const html = await fetchPage('/')
 
     for (const upload of recentUploads) {
-      // 詳細画面は videoListItems の id で引く。同じ動画なら id を揃える
+      // è©³ç´°ç»é¢ã¯ videoListItems ã® id ã§å¼ããåãåç»ãªã id ãæãã
       expect(videoListItems.some(video => video.id === upload.id)).toBe(true)
 
       const href = `${videoListPath}/${upload.id}`
@@ -454,7 +471,7 @@ describe('SVCP mock screens', async () => {
     expect(html).not.toContain('下書き')
 
     const listCss = (await stylesheetText(html)).replace(/\s+/g, '')
-    // 固定幅だと「すべてのステータス」「アップロード日時」が2行・見切れになる
+    // åºå®å¹ã ã¨ããã¹ã¦ã®ã¹ãã¼ã¿ã¹ããã¢ããã­ã¼ãæ¥æãã2è¡ã»è¦åãã«ãªã
     expect(listCss).toMatch(/\.status-filter\{[^}]*white-space:nowrap/)
     expect(listCss).toMatch(/\.status-filter\{[^}]*width:auto/)
     expect(listCss).toMatch(/\.filter-select\{[^}]*white-space:nowrap/)
@@ -573,12 +590,12 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.video-player-container\{[^}]*width:50%/)
     expect(css).toMatch(/\.video-player-container\{[^}]*aspect-ratio:16\/9/)
     expect(css).toMatch(/\.video-player-container\{[^}]*align-self:center/)
-    // 1440px 固定と overflow で右ペインがクリップされないこと
+    // 1440px åºå®ã¨ overflow ã§å³ãã¤ã³ãã¯ãªãããããªããã¨
     expect(css).toMatch(/\.screen-video-detail\{[^}]*min-width:0/)
     expect(css).toMatch(/\.screen-video-detail\.page-body\{[^}]*min-width:0/)
     expect(css).toMatch(/\.screen-video-detail\.main-content\{[^}]*overflow-x:visible/)
     expect(css).toMatch(/\.right-pane\{[^}]*min-width:380px/)
-    // 固定幅だと「キャンセル」「変更を保存」「削除」が2行・見切れになる
+    // åºå®å¹ã ã¨ãã­ã£ã³ã»ã«ããå¤æ´ãä¿å­ããåé¤ãã2è¡ã»è¦åãã«ãªã
     expect(css).toMatch(/\.header-cancel,.header-delete,.header-save\{[^}]*width:auto/)
     expect(css).toMatch(/\.header-cancel,.header-delete,.header-save\{[^}]*white-space:nowrap/)
     expect(css).toMatch(/\.copy-btn\{[^}]*width:auto/)
@@ -714,7 +731,7 @@ describe('SVCP mock screens', async () => {
     expect(fileInput).not.toMatch(/\bmultiple\b/)
 
     for (const step of conversionSteps) {
-      expect(html).toContain(step.label)
+      expect(html).toContain(conversionStepLabel[step.id])
     }
 
     const dashboardNav = firstAnchorWithHref(html, '/')
@@ -795,7 +812,7 @@ describe('SVCP mock screens', async () => {
     expect(videosNav).not.toContain('nav-item-active')
 
     const css = (await stylesheetText(html)).replace(/\s+/g, '')
-    // アカウント・会員・支払いカードでセレクタを共有しているため、クラス名の直後が { とは限らない
+    // ã¢ã«ã¦ã³ãã»ä¼å¡ã»æ¯æãã«ã¼ãã§ã»ã¬ã¯ã¿ãå±æãã¦ãããããã¯ã©ã¹åã®ç´å¾ã { ã¨ã¯éããªã
     expect(css).toMatch(/\.account-info[,{][^}]*background:#fff/)
     expect(css).toMatch(/\.account-info[,{][^}]*border-radius:12px/)
     expect(css).toMatch(/\.membership-status[,{][^}]*background:#fff/)

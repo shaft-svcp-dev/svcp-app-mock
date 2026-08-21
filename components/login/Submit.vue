@@ -3,11 +3,13 @@ import {
   forgotPasswordLinkLabel,
   forgotPasswordPromptLabel,
   loginButtonLabel,
-  passwordResetPath,
   signupLinkLabel,
-  signupPath,
   signupPromptLabel,
-} from '~/mocks/login'
+} from '~/constants/login'
+import {
+  passwordResetPath,
+  signupPath,
+} from '~/routes'
 </script>
 
 <template>

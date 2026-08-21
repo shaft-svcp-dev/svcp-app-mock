@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { emailFieldLabel, emailPlaceholder } from '~/mocks/password-reset'
+import { emailFieldLabel, emailPlaceholder } from '~/constants/password-reset'
 
 const email = defineModel<string>('email', { required: true })
 </script>

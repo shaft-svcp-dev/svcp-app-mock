@@ -1,5 +1,11 @@
-import { isAuthenticated, loginPath, passwordResetPath, signupPath } from '~/mocks/login'
-import { passwordResetSentPath } from '~/mocks/password-reset'
+import { isAuthenticated } from '~/mocks/login'
+import {
+  dashboardPath,
+  loginPath,
+  passwordResetPath,
+  passwordResetSentPath,
+  signupPath,
+} from '~/routes'
 
 export default defineNuxtRouteMiddleware((to) => {
   // localStorage はサーバーに無い。未ログイン判定とリダイレクトはブラウザだけで行う
@@ -19,6 +25,6 @@ export default defineNuxtRouteMiddleware((to) => {
 
   // ログイン済みで認証前画面に戻らない
   if (isLoggedIn && isPublicAuthRoute) {
-    return navigateTo('/')
+    return navigateTo(dashboardPath)
   }
 })

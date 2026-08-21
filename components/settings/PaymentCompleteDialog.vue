@@ -2,7 +2,7 @@
 import {
   paymentCompleteConfirmLabel,
   paymentCompleteTitle,
-} from '~/mocks/settings'
+} from '~/constants/settings'
 
 const open = defineModel<boolean>('open', { required: true })
 
@@ -11,14 +11,13 @@ const emit = defineEmits<{
 }>()
 
 function confirm() {
-  // この画面に留まるためダイアログ側で閉じる。有料会員への切替はページが担う
-  open.value = false
+  // こ�E画面に留まるためダイアログ側で閉じる。有料会員への刁E��はペ�Eジが担ぁE  open.value = false
   emit('confirm')
 }
 </script>
 
 <template>
-  <!-- 閉じているときも DOM に残し、SSR と支援技術からダイアログの役割が分かるようにする -->
+  <!-- 閉じてぁE��ときも DOM に残し、SSR と支援技術からダイアログの役割が�Eかるようにする -->
   <div
     class="delete-dialog-overlay payment-complete-overlay"
     :hidden="!open"

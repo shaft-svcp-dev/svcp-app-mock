@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { videoStatusLabel } from '~/constants/dashboard'
+import { videoTableColumns } from '~/constants/videos'
 import type { VideoListItem } from '~/mocks/videos'
-import { videoStatusLabel } from '~/mocks/dashboard'
-import { videoTableColumns } from '~/mocks/videos'
+import { videoListPath } from '~/routes'
 
 defineProps<{
   videos: readonly VideoListItem[]
@@ -25,7 +26,7 @@ defineProps<{
         v-for="video in videos"
         :key="video.id"
         class="table-row"
-        :to="`/videos/${video.id}`"
+        :to="`${videoListPath}/${video.id}`"
       >
         <img
           class="col-thumbnail video-thumb"

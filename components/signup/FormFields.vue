@@ -11,7 +11,7 @@ import {
   passwordMismatchMessage,
   passwordPlaceholder,
   requiredFieldLabel,
-} from '~/mocks/signup'
+} from '~/constants/signup'
 
 const companyName = defineModel<string>('companyName', { required: true })
 const fullName = defineModel<string>('fullName', { required: true })
@@ -22,7 +22,7 @@ const passwordConfirm = defineModel<string>('passwordConfirm', { required: true 
 const passwordConfirmInput = ref<HTMLInputElement | null>(null)
 
 watch([password, passwordConfirm], () => {
-  // 確認欄があるので、見た目のないネイティブ検証で一致だけ見る
+  // 確認欁E��あるので、見た目のなぁE��イチE��ブ検証で一致だけ見る
   passwordConfirmInput.value?.setCustomValidity(
     password.value === passwordConfirm.value ? '' : passwordMismatchMessage,
   )

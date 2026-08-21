@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import {
-  loginPath,
-  loginScreenLinkLabel,
-  passwordResetButtonLabel,
-} from '~/mocks/password-reset'
+import { loginScreenLinkLabel, passwordResetButtonLabel } from '~/constants/password-reset'
+import { loginPath } from '~/routes'
 </script>
 
 <template>

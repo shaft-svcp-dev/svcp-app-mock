@@ -1,12 +1,12 @@
 <script setup lang="ts">
-// 同一ディレクトリの prefix 解決に寄せ、完了画面でも Branding は明示 import する
+// 同一チE��レクトリの prefix 解決に寁E��、完亁E��面でめEBranding は明示 import する
 import PasswordResetBranding from '~/components/password-reset/Branding.vue'
-import { productName } from '~/mocks/dashboard'
+import { productName } from '~/constants/dashboard'
 import {
-  loginPath,
   loginScreenLinkLabel,
   passwordResetSentTitle,
-} from '~/mocks/password-reset'
+} from '~/constants/password-reset'
+import { loginPath } from '~/routes'
 
 definePageMeta({
   layout: false,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { videoStatusLabel, type VideoStatus } from '~/mocks/dashboard'
+import { videoStatusLabel } from '~/constants/dashboard'
+import type { VideoStatus } from '~/mocks/dashboard'
 import type { VideoListItem } from '~/mocks/videos'
 import {
   copyButtonLabel,
@@ -9,7 +10,7 @@ import {
   publishToggleLabel,
   streamUrlSectionTitle,
   visibilitySectionTitle,
-} from '~/mocks/video-detail'
+} from '~/constants/video-detail'
 
 const props = defineProps<{
   video: VideoListItem

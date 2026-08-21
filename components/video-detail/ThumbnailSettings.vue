@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {
-  thumbnailFileAccept,
   thumbnailHint,
   thumbnailResetLabel,
   thumbnailSectionTitle,
   thumbnailUploadLabel,
-} from '~/mocks/video-detail'
+} from '~/constants/video-detail'
+import { thumbnailFileAccept } from '~/mocks/video-detail'
 
 const src = defineModel<string>('src', { required: true })
 
@@ -29,7 +29,7 @@ function isAllowedThumbnail(file: File) {
 }
 
 function revokeIfBlob(url: string) {
-  // 一覧レコードの静的パスは取り消さない。プレビュー用 blob だけ解放する
+  // 一覧レコード�E静的パスは取り消さなぁE���Eレビュー用 blob だけ解放する
   if (url.startsWith('blob:')) {
     URL.revokeObjectURL(url)
   }

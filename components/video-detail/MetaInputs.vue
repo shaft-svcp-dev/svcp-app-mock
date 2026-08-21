@@ -2,7 +2,7 @@
 import {
   descriptionFieldLabel,
   titleFieldLabel,
-} from '~/mocks/video-detail'
+} from '~/constants/video-detail'
 
 const title = defineModel<string>('title', { required: true })
 const description = defineModel<string>('description', { required: true })

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { productName } from '~/mocks/dashboard'
-import { loginTagline } from '~/mocks/login'
+import { productName } from '~/constants/dashboard'
+import { loginTagline } from '~/constants/login'
 </script>
 
 <template>

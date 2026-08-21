@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { termsConsentLabel } from '~/mocks/signup'
+import { termsConsentLabel } from '~/constants/signup'
 
 const agreed = defineModel<boolean>({ required: true })
 </script>

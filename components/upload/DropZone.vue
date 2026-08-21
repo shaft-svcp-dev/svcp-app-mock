@@ -3,8 +3,8 @@ import {
   dropZoneSubtitle,
   dropZoneTitle,
   selectFileButtonLabel,
-  videoFileAccept,
-} from '~/mocks/upload'
+} from '~/constants/upload'
+import { videoFileAccept } from '~/mocks/upload'
 
 defineProps<{
   multiple: boolean
@@ -31,8 +31,7 @@ function onFileChange(event: Event) {
 }
 
 function onDragOver(event: DragEvent) {
-  // preventDefault しないと drop がファイルを開くブラウザ既定動作になる
-  event.preventDefault()
+  // preventDefault しなぁE�� drop がファイルを開くブラウザ既定動作になめE  event.preventDefault()
 }
 
 function onDrop(event: DragEvent) {

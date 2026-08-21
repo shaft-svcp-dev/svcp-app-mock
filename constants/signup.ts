@@ -1,5 +1,7 @@
+import { loginTagline } from './login'
+
 /**
- * UIモック。API未接続のため、画面表示専用の固定データ。
+ * 会員登録画面の表示文言。
  * ラベルは Figma レイヤー名から取る。
  * ボタンは 15px / 幅 60px（CJK 1em で4字）から「会員登録」と復元する。
  * タイトルは画面名「新規会員登録」。placeholder に hug 幅が無いため、
@@ -7,14 +9,6 @@
  * tagline 文字列は CSS に無い。1行枠だが製品用途は login と同一のため複製しない。
  * ログインへの文字リンクは、ログイン画面の「会員登録はこちら」に対応する。
  */
-import {
-  emailFieldLabel,
-  emailPlaceholder,
-  loginPath,
-  loginTagline,
-  passwordFieldLabel,
-  passwordPlaceholder,
-} from './login'
 
 export const signupTitle = '新規会員登録'
 export const signupTagline = loginTagline
@@ -32,7 +26,6 @@ export const passwordMismatchMessage = 'パスワードが一致しません'
 export {
   emailFieldLabel,
   emailPlaceholder,
-  loginPath,
   passwordFieldLabel,
   passwordPlaceholder,
-}
+} from './login'

@@ -4,7 +4,7 @@ import {
   emailPlaceholder,
   passwordFieldLabel,
   passwordPlaceholder,
-} from '~/mocks/login'
+} from '~/constants/login'
 
 const email = defineModel<string>('email', { required: true })
 const password = defineModel<string>('password', { required: true })
