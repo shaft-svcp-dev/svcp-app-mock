@@ -284,7 +284,7 @@ describe('component directories', () => {
     expect(uploadSource).toContain(':multiple="isPaid"')
   })
 
-  it('stores auth and membership in localStorage instead of cookies', () => {
+  it('stores auth, membership, and deleted video ids in localStorage instead of cookies', () => {
     expect(fileNames(composableSources).sort()).toEqual([
       'useAuthStorage.ts',
       'useClientStorage.ts',
@@ -297,6 +297,9 @@ describe('component directories', () => {
     })?.[1]
     const membershipSource = Object.entries(composableSources).find(([path]) => {
       return path.endsWith('useMembership.ts')
+    })?.[1]
+    const deletedIdsSource = Object.entries(composableSources).find(([path]) => {
+      return path.endsWith('useDeletedVideoIds.ts')
     })?.[1]
     const clientStorageSource = Object.entries(composableSources).find(([path]) => {
       return path.endsWith('useClientStorage.ts')
@@ -322,6 +325,11 @@ describe('component directories', () => {
     expect(membershipSource).toContain('useClientStorage')
     expect(membershipSource).toContain('membershipStorageKey')
     expect(membershipSource).not.toContain('useCookie')
+
+    expect(deletedIdsSource).toBeDefined()
+    expect(deletedIdsSource).toContain('useClientStorage')
+    expect(deletedIdsSource).toContain('deletedVideoIdsStorageKey')
+    expect(deletedIdsSource).not.toContain('useCookie')
 
     expect(middlewareSource).toBeDefined()
     expect(middlewareSource).toContain('import.meta.server')

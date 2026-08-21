@@ -12,7 +12,6 @@ import {
   videoStatusLabel,
 } from '../mocks/dashboard'
 import {
-  deletedVideoIdsCookieName,
   excludeDeletedVideos,
   parseDeletedVideoIds,
   searchPlaceholder,
@@ -147,20 +146,8 @@ async function stylesheetText(html: string): Promise<string> {
   return [...inline, ...linked].join('\n')
 }
 
-function fetchPage(path: string, extraCookies: Record<string, string> = {}) {
-  const cookie = Object.entries(extraCookies)
-    .map(([name, value]) => `${name}=${encodeURIComponent(value)}`)
-    .join('; ')
-
-  if (!cookie) {
-    return $fetch<string>(path)
-  }
-
-  return $fetch<string>(path, {
-    headers: {
-      cookie,
-    },
-  })
+function fetchPage(path: string) {
+  return $fetch<string>(path)
 }
 
 function headerActionsHtml(html: string): string {
@@ -818,19 +805,12 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.header-delete\{[^}]*cursor:pointer/)
   })
 
-  it('hides deleted videos from the list', async () => {
+  it('excludes deleted video ids from visible lists', () => {
     const video = videoListItems[0]
     expect(parseDeletedVideoIds(undefined)).toEqual([])
     expect(parseDeletedVideoIds(video.id)).toEqual([video.id])
     expect(excludeDeletedVideos(videoListItems, [video.id]).some(item => item.id === video.id))
       .toBe(false)
-
-    const html = await fetchPage('/videos', {
-      [deletedVideoIdsCookieName]: video.id,
-    })
-
-    expect(html).not.toContain(video.title)
-    expect(html).toContain(videoListItems[1].title)
   })
 
   it('renders the settings delete confirmation dialog from mock data', async () => {

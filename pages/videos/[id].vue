@@ -25,7 +25,7 @@ const { isPaid } = useMembership()
 const { deletedIds, markDeleted } = useDeletedVideoIds()
 const video = videoListItems.find(item => item.id === route.params.id)
 
-// モック配列は消さない。削除済み id の Cookie がある動画は存在しないものとして扱う
+// モック配列は消さない。削除済み id が localStorage にある動画は存在しないものとして扱う
 if (!video || deletedIds.value.includes(video.id)) {
   throw createError({
     statusCode: 404,

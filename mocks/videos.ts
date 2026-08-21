@@ -16,8 +16,8 @@ export interface VideoListItem {
   thumbnailAlt: string
 }
 
-// モック配列は書き換えない。削除済み id は Cookie で画面をまたいで隠す
-export const deletedVideoIdsCookieName = 'svcp-deleted-video-ids'
+// モック配列は書き換えない。削除済み id は localStorage で画面をまたいで隠す
+export const deletedVideoIdsStorageKey = 'svcp-deleted-video-ids'
 
 export function parseDeletedVideoIds(value: string | null | undefined): string[] {
   if (!value) {
