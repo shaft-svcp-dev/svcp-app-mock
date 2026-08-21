@@ -112,6 +112,18 @@ function statValues(html: string): string[] {
   return [...html.matchAll(/<span class="stat-value">([^<]*)<\/span>/g)].map(match => match[1])
 }
 
+function statCardByLabel(html: string, label: string): string | undefined {
+  const cards = html.match(
+    /<(?:a|article)\b[^>]*class="[^"]*\bstat-card\b[^"]*"[^>]*>[\s\S]*?<\/(?:a|article)>/g,
+  ) ?? []
+  return cards.find(card => card.includes(`<span class="stat-label">${label}</span>`))
+}
+
+function selectedOptionValue(html: string): string | undefined {
+  return html.match(/<option[^>]*value="([^"]*)"[^>]*selected/)?.[1]
+    ?? html.match(/<option[^>]*selected[^>]*value="([^"]*)"/)?.[1]
+}
+
 describe('SVCP mock screens', async () => {
   await setup({
     rootDir: '.',
@@ -289,6 +301,15 @@ describe('SVCP mock screens', async () => {
       String(videoListItems.filter(video => video.status === 'unpublished').length),
       '0',
     ])
+    expect(statCardByLabel(html, totalVideosStatLabel)).toMatch(/href="\/videos"/)
+    expect(statCardByLabel(html, videoStatusLabel.published)).toMatch(
+      /href="\/videos\?status=published"/,
+    )
+    expect(statCardByLabel(html, videoStatusLabel.unpublished)).toMatch(
+      /href="\/videos\?status=unpublished"/,
+    )
+    expect(statCardByLabel(html, totalPlayCountStatLabel)).toMatch(/^<article\b/)
+    expect(statCardByLabel(html, totalPlayCountStatLabel)).not.toMatch(/href=/)
     expect(html).toContain('最近のアップロード')
     expect(html).toContain('すべて見る')
     expect(html).toContain('製品UIデモ：ダッシュボード操作説明')
@@ -316,6 +337,8 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.stat-card\{[^}]*height:107px/)
     expect(css).toMatch(/\.stat-card\{[^}]*padding:24px/)
     expect(css).toMatch(/\.stat-card\{[^}]*gap:16px/)
+    expect(css).toMatch(/\.stat-card\{[^}]*text-decoration:none/)
+    expect(css).toMatch(/\.stat-card\{[^}]*color:inherit/)
     expect(css).toMatch(/\.icon-container\{[^}]*width:48px/)
     expect(css).toMatch(/\.icon-container\{[^}]*height:48px/)
   })
@@ -380,6 +403,26 @@ describe('SVCP mock screens', async () => {
     expect(videosNav).toContain('nav-item-active')
     expect(videosNav).toContain('aria-current="page"')
     expect(dashboardNav).not.toContain('nav-item-active')
+  })
+
+  it('filters the video list by status query from dashboard stat cards', async () => {
+    const publishedHtml = await authenticatedFetch('/videos?status=published')
+    const unpublishedHtml = await authenticatedFetch('/videos?status=unpublished')
+    const publishedVideos = videoListItems.filter(video => video.status === 'published')
+    const unpublishedVideos = videoListItems.filter(video => video.status === 'unpublished')
+
+    expect(selectedOptionValue(publishedHtml)).toBe('published')
+    expect(selectedOptionValue(unpublishedHtml)).toBe('unpublished')
+
+    for (const video of publishedVideos) {
+      expect(publishedHtml).toContain(video.title)
+      expect(unpublishedHtml).not.toContain(video.title)
+    }
+
+    for (const video of unpublishedVideos) {
+      expect(unpublishedHtml).toContain(video.title)
+      expect(publishedHtml).not.toContain(video.title)
+    }
   })
 
   it('renders the video detail from list mock data with video-list nav active', async () => {

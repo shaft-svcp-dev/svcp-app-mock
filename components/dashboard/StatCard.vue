@@ -7,7 +7,23 @@ defineProps<{
 </script>
 
 <template>
-  <article class="stat-card">
+  <NuxtLink
+    v-if="stat.to"
+    :to="stat.to"
+    class="stat-card"
+  >
+    <div class="stat-card-content">
+      <span class="stat-label">{{ stat.label }}</span>
+      <span class="stat-value">{{ stat.value }}</span>
+    </div>
+    <div class="icon-container" :class="`icon-container-${stat.tone}`">
+      <AppIcon :name="stat.icon" :size="24" />
+    </div>
+  </NuxtLink>
+  <article
+    v-else
+    class="stat-card"
+  >
     <div class="stat-card-content">
       <span class="stat-label">{{ stat.label }}</span>
       <span class="stat-value">{{ stat.value }}</span>

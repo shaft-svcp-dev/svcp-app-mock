@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { productName } from '~/mocks/dashboard'
+import { productName, videoListStatusQueryParam } from '~/mocks/dashboard'
 import type { VideoListStatusFilter } from '~/mocks/videos'
 import { videoListItems, videoListTitle } from '~/mocks/videos'
 
@@ -11,8 +11,28 @@ useHead({
   title: `${videoListTitle} | ${productName}`,
 })
 
-const query = ref('')
-const statusFilter = ref<VideoListStatusFilter>('all')
+function statusFilterFromQuery(value: unknown): VideoListStatusFilter {
+  // 同一キーの重複は配列。published / unpublished 以外は絞り込みなし
+  const raw = Array.isArray(value) ? value[0] : value
+  if (raw === 'published' || raw === 'unpublished') {
+    return raw
+  }
+  return 'all'
+}
+
+const route = useRoute()
+const searchQuery = ref('')
+const statusFilter = ref<VideoListStatusFilter>(
+  statusFilterFromQuery(route.query[videoListStatusQueryParam]),
+)
+
+// ダッシュボードの件数カード（クエリ付き）と一覧ナビ（クエリなし）の同一ページ遷移を反映する
+watch(
+  () => route.query[videoListStatusQueryParam],
+  (value) => {
+    statusFilter.value = statusFilterFromQuery(value)
+  },
+)
 
 function uploadedAtTime(value: string): number {
   // Figma の表示形式 `YYYY/MM/DD HH:mm` を Date.parse できるハイフン区切りにする
@@ -20,13 +40,13 @@ function uploadedAtTime(value: string): number {
 }
 
 const visibleVideos = computed(() => {
-  const normalizedQuery = query.value.trim()
+  const normalizedSearch = searchQuery.value.trim()
 
   return videoListItems
     .filter((video) => {
       const matchesStatus = statusFilter.value === 'all' || video.status === statusFilter.value
-      const matchesQuery = normalizedQuery === '' || video.title.includes(normalizedQuery)
-      return matchesStatus && matchesQuery
+      const matchesSearch = normalizedSearch === '' || video.title.includes(normalizedSearch)
+      return matchesStatus && matchesSearch
     })
     .sort((left, right) => uploadedAtTime(right.uploadedAt) - uploadedAtTime(left.uploadedAt))
 })
@@ -40,7 +60,7 @@ const visibleVideos = computed(() => {
   </AppHeader>
   <div class="page-body">
     <VideoListFilterRow
-      v-model:query="query"
+      v-model:query="searchQuery"
       v-model:status-filter="statusFilter"
     />
     <VideoListTable :videos="visibleVideos" />

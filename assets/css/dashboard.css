@@ -261,6 +261,9 @@ body {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
+  /* NuxtLink 化してもカード見た目を保つ（下線なし・文字色継承） */
+  text-decoration: none;
+  color: inherit;
 }
 
 .stat-card-content {

@@ -30,6 +30,8 @@ export interface DashboardStat {
   value: string
   icon: StatIconName
   tone: StatTone
+  // 指定時は動画一覧へ遷移する。遷移しないカードは省略する
+  to?: string
 }
 
 export interface RecentUpload {
@@ -45,6 +47,8 @@ export interface RecentUpload {
 
 export const productName = 'SVCP'
 export const dashboardTitle = 'ダッシュボード'
+export const videoListPath = '/videos'
+export const videoListStatusQueryParam = 'status'
 export const uploadButtonLabel = '動画をアップロード'
 export const logoutButtonLabel = 'ログアウト'
 export const recentSectionTitle = '最近のアップロード'
@@ -70,6 +74,7 @@ export function buildDashboardStats(
       value: String(videos.length),
       icon: 'file-video',
       tone: 'blue',
+      to: videoListPath,
     },
     {
       id: 'published',
@@ -77,6 +82,7 @@ export function buildDashboardStats(
       value: String(publishedCount),
       icon: 'badge-check',
       tone: 'green',
+      to: `${videoListPath}?${videoListStatusQueryParam}=published`,
     },
     {
       id: 'unpublished',
@@ -84,7 +90,9 @@ export function buildDashboardStats(
       value: String(unpublishedCount),
       icon: 'loader',
       tone: 'amber',
+      to: `${videoListPath}?${videoListStatusQueryParam}=unpublished`,
     },
+    // 総再生回数は一覧の絞り込み条件に対応しないため、to を付けずリンクにしない
     {
       id: 'play-count',
       label: totalPlayCountStatLabel,
@@ -108,7 +116,7 @@ export const dashboardUser: DashboardUser = {
 
 export const dashboardNavItems: readonly DashboardNavItem[] = [
   { id: 'dashboard', label: 'ダッシュボード', icon: 'layout-dashboard', to: '/' },
-  { id: 'video-list', label: '動画一覧', icon: 'video', to: '/videos' },
+  { id: 'video-list', label: '動画一覧', icon: 'video', to: videoListPath },
   { id: 'upload', label: 'アップロード', icon: 'cloud-upload', to: '/upload' },
   { id: 'settings', label: '設定', icon: 'sliders-horizontal', to: '/settings' },
 ]
