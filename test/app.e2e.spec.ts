@@ -602,6 +602,17 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.copy-btn\{[^}]*white-space:nowrap/)
   })
 
+  it('keeps a single vertical scrollbar on the video detail screen', async () => {
+    const video = videoListItems[0]
+    const html = await fetchPage(`/videos/${video.id}`)
+    const css = (await stylesheetText(html)).replace(/\s+/g, '')
+
+    expect(css).toMatch(/\.screen-video-detail\{[^}]*min-height:0/)
+    expect(css).toMatch(/\.screen-video-detail\{[^}]*overflow:hidden/)
+    expect(css).toMatch(/\.screen-video-detail\.main-content\{[^}]*min-height:0/)
+    expect(css).toMatch(/\.screen-video-detail\.main-content\{[^}]*overflow-y:auto/)
+  })
+
   it('hides video delete controls for free members', async () => {
     const video = videoListItems[0]
     const html = await fetchPage(`/videos/${video.id}`)

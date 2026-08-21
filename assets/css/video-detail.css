@@ -2,6 +2,9 @@
 .screen-video-detail {
   min-width: 0;
   max-width: 100%;
+  /* 共通の min-height:1024px が 100vh を超えると、画面全体と main-content の二重スクロールになる */
+  min-height: 0;
+  overflow: hidden;
 }
 
 .screen-video-detail .page-body {
@@ -14,6 +17,8 @@
 
 .screen-video-detail .main-content {
   min-width: 0;
+  /* flex 子の既定 min-height:auto だと内容高まで伸び、内側の縦スクロールが効かない */
+  min-height: 0;
   flex-shrink: 1;
   overflow-x: visible;
   overflow-y: auto;
