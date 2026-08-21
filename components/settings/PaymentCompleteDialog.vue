@@ -11,13 +11,14 @@ const emit = defineEmits<{
 }>()
 
 function confirm() {
-  // こ�E画面に留まるためダイアログ側で閉じる。有料会員への刁E��はペ�Eジが担ぁE  open.value = false
+  // この画面に留まるためダイアログ側で閉じる。有料会員への切り替えはページが担う
+  open.value = false
   emit('confirm')
 }
 </script>
 
 <template>
-  <!-- 閉じてぁE��ときも DOM に残し、SSR と支援技術からダイアログの役割が�Eかるようにする -->
+  <!-- 閉じていても DOM に残し、SSR と支援技術からダイアログの役割が分かるようにする -->
   <div
     class="delete-dialog-overlay payment-complete-overlay"
     :hidden="!open"

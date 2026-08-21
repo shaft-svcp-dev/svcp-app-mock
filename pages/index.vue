@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// prefix 付きコンポーネントはページ変換で自動解決されないことがある
+import DashboardStatCard from '~/components/dashboard/StatCard.vue'
+import DashboardVideoRow from '~/components/dashboard/VideoRow.vue'
 import {
   buildDashboardStats,
   dashboardTitle,

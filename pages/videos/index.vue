@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// prefix 付きコンポーネントはページ変換で自動解決されないことがある
+import VideoListFilterRow from '~/components/video-list/FilterRow.vue'
+import VideoListTable from '~/components/video-list/Table.vue'
 import { productName } from '~/constants/dashboard'
 import { videoListTitle } from '~/constants/videos'
 import type { VideoListStatusFilter } from '~/mocks/videos'

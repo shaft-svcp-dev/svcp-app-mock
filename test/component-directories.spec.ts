@@ -1,4 +1,12 @@
+// @ts-expect-error Vitest は Node で動く。型パッケージは依存に足していない
+import { readdirSync, readFileSync } from 'node:fs'
+// @ts-expect-error Vitest は Node で動く。型パッケージは依存に足していない
+import { join, relative } from 'node:path'
+// @ts-expect-error Vitest は Node で動く。型パッケージは依存に足していない
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+
+const repoRoot = fileURLToPath(new URL('..', import.meta.url))
 
 const commonComponents = import.meta.glob('../components/common/*.vue')
 const dashboardComponents = import.meta.glob('../components/dashboard/*.vue')
@@ -46,11 +54,6 @@ const settingsPage = import.meta.glob('../pages/settings.vue', {
   query: '?raw',
   import: 'default',
 }) as Record<string, string>
-const settingsSources = import.meta.glob('../components/settings/*.vue', {
-  eager: true,
-  query: '?raw',
-  import: 'default',
-}) as Record<string, string>
 const composableSources = import.meta.glob('../composables/*.ts', {
   eager: true,
   query: '?raw',
@@ -77,19 +80,152 @@ const routeSources = import.meta.glob('../routes.ts', {
   import: 'default',
 }) as Record<string, string>
 
+// Vite glob の登録漏れを避けるため、ディスク上のソースを直接読む
+function readSourceTree(relativeDir: string, suffix: string): Record<string, string> {
+  const sources: Record<string, string> = {}
+
+  function walk(current: string) {
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      const fullPath = join(current, entry.name)
+      if (entry.isDirectory()) {
+        walk(fullPath)
+        continue
+      }
+
+      if (!entry.name.endsWith(suffix)) {
+        continue
+      }
+
+      sources[relative(repoRoot, fullPath).replaceAll('\\', '/')] = readFileSync(fullPath, 'utf8')
+    }
+  }
+
+  walk(join(repoRoot, relativeDir))
+  return sources
+}
+
+const pageSourcesOnDisk = readSourceTree('pages', '.vue')
+const componentSourcesOnDisk = readSourceTree('components', '.vue')
+const layoutSourcesOnDisk = readSourceTree('layouts', '.vue')
+const composableSourcesOnDisk = readSourceTree('composables', '.ts')
+const middlewareSourcesOnDisk = readSourceTree('middleware', '.ts')
+const constantSourcesOnDisk = readSourceTree('constants', '.ts')
+const mockSourcesOnDisk = readSourceTree('mocks', '.ts')
+const nuxtConfigOnDisk = readFileSync(join(repoRoot, 'nuxt.config.ts'), 'utf8')
+const routesOnDisk = readFileSync(join(repoRoot, 'routes.ts'), 'utf8')
+
 function fileNames(modules: Record<string, unknown>): string[] {
   return Object.keys(modules).map(path => path.split('/').at(-1) ?? path)
 }
 
-function expectLiveImport(source: string | undefined, modulePath: string) {
+function expectLiveImport(source: string | undefined, modulePath: string, fromPath = 'source') {
   // コメント行に残ったパスでは自動解決されない。行頭の import だけを契約する
-  expect(source).toBeDefined()
-  expect(source).toMatch(
+  expect(source, fromPath).toBeDefined()
+  expect(source, fromPath).toMatch(
     new RegExp(`^import .+'${modulePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`, 'm'),
   )
 }
 
+// コメントに残ると実行されない文（import・代入・関数・useHead）
+const swallowedStatement = /\/\/.*(?:import\s+(?:type\s+)?(?:\{[^}]+\}|\w[\w$]*)\s+from\s+['"`]|const\s+\w[\w$]*\s*=|let\s+\w[\w$]*\s*=|function\s+\w|await\s+\w[\w$]*|useHead\s*\(|\w[\w$]*\.value\s*=)/
+
+function prefixedComponentDirs(config: string): { prefix: string, importPath: string }[] {
+  const dirs: { prefix: string, importPath: string }[] = []
+  // pathPrefix: false を終点に含めないと、共通ディレクトリが次の prefix を拾う
+  const blockPattern =
+    /path:\s*'~\/components\/(?<dir>[^']+)'[\s\S]*?(prefix:\s*'(?<prefix>[^']+)'|pathPrefix:\s*false)/g
+
+  for (const match of config.matchAll(blockPattern)) {
+    const dir = match.groups?.dir
+    const prefix = match.groups?.prefix
+    if (!dir || !prefix) {
+      continue
+    }
+
+    dirs.push({ prefix, importPath: `~/components/${dir}` })
+  }
+
+  // Video と VideoList のように短い prefix が長いタグへ誤マッチしないよう、長い順に試す
+  return dirs.sort((left, right) => right.prefix.length - left.prefix.length)
+}
+
+function sfcTemplate(source: string): string {
+  const start = source.search(/<template(\s[^>]*)?>/)
+  if (start < 0) {
+    return ''
+  }
+
+  const openEnd = source.indexOf('>', start)
+  // 内側の <template #slot> の閉じタグで切らない
+  const close = source.lastIndexOf('</template>')
+  if (openEnd < 0 || close < 0) {
+    return ''
+  }
+
+  return source.slice(openEnd + 1, close)
+}
+
+function prefixedTemplateImports(source: string, dirs: { prefix: string, importPath: string }[]): string[] {
+  const tags = [...sfcTemplate(source).matchAll(/<([A-Z][A-Za-z0-9]*)/g)].map(match => match[1])
+  const modulePaths = new Set<string>()
+
+  for (const tag of tags) {
+    const dir = dirs.find(entry => tag.startsWith(entry.prefix) && tag.length > entry.prefix.length)
+    if (!dir) {
+      continue
+    }
+
+    modulePaths.add(`${dir.importPath}/${tag.slice(dir.prefix.length)}.vue`)
+  }
+
+  return [...modulePaths]
+}
+
 describe('component directories', () => {
+  it('keeps live statements off // comment lines', () => {
+    const sources = {
+      ...pageSourcesOnDisk,
+      ...componentSourcesOnDisk,
+      ...layoutSourcesOnDisk,
+      ...composableSourcesOnDisk,
+      ...middlewareSourcesOnDisk,
+      ...constantSourcesOnDisk,
+      ...mockSourcesOnDisk,
+      'routes.ts': routesOnDisk,
+    }
+
+    for (const [path, source] of Object.entries(sources)) {
+      for (const [index, line] of source.split(/\r?\n/).entries()) {
+        if (!line.trimStart().startsWith('//')) {
+          continue
+        }
+
+        expect(line, `${path}:${index + 1}`).not.toMatch(swallowedStatement)
+      }
+    }
+  })
+
+  it('imports prefixed page components with a live import so SSR and client stay in sync', () => {
+    const dirs = prefixedComponentDirs(nuxtConfigOnDisk)
+    expect(dirs.map(dir => dir.prefix).sort()).toEqual([
+      'Dashboard',
+      'Login',
+      'PasswordReset',
+      'Settings',
+      'Signup',
+      'Upload',
+      'VideoDetail',
+      'VideoList',
+    ])
+
+    const sources = { ...pageSourcesOnDisk, ...layoutSourcesOnDisk }
+    for (const [path, source] of Object.entries(sources)) {
+      for (const modulePath of prefixedTemplateImports(source, dirs)) {
+        expectLiveImport(source, modulePath, `${path} -> ${modulePath}`)
+      }
+    }
+  })
+
   it('places shared components in components/common', () => {
     expect(fileNames(commonComponents).sort()).toEqual([
       'AppHeader.vue',
@@ -146,15 +282,8 @@ describe('component directories', () => {
   })
 
   it('imports video-detail components from the dynamic detail page', () => {
-    // 動的ルートでは自動解決がページ変換に乗らず本体が空になることがあるため、明示 import を契約する
     const source = Object.entries(videoPages).find(([path]) => path.includes('[id]'))?.[1]
     expect(source).toBeDefined()
-    expectLiveImport(source, '~/components/video-detail/Player.vue')
-    expectLiveImport(source, '~/components/video-detail/MetaInputs.vue')
-    expectLiveImport(source, '~/components/video-detail/SidePane.vue')
-    expectLiveImport(source, '~/components/video-detail/DeleteDialog.vue')
-    expectLiveImport(source, '~/components/video-detail/ThumbnailSettings.vue')
-    expectLiveImport(source, '~/components/video-detail/SubtitleSettings.vue')
     expect(source).toContain('navigateTo(videoListPath)')
   })
 
@@ -195,15 +324,6 @@ describe('component directories', () => {
     expect(playerSource).toContain('<track')
   })
 
-  it('imports upload components from the upload page', () => {
-    // ページ名 Upload と prefix Upload* が重なると自動解決が乗らず、SSRとクライアントが食い違う
-    const source = Object.values(uploadPage)[0]
-    expect(source).toBeDefined()
-    expectLiveImport(source, '~/components/upload/DropZone.vue')
-    expectLiveImport(source, '~/components/upload/ConversionPipeline.vue')
-    expectLiveImport(source, '~/components/upload/FileInfo.vue')
-  })
-
   it('places login page components in components/login', () => {
     expect(fileNames(loginComponents).sort()).toEqual([
       'Branding.vue',
@@ -213,12 +333,8 @@ describe('component directories', () => {
   })
 
   it('imports login components from the login page without the shared chrome layout', () => {
-    // ページ名 Login と prefix Login* が重なると自動解決が乗らず、SSRとクライアントが食い違う
     const source = Object.values(loginPage)[0]
     expect(source).toBeDefined()
-    expectLiveImport(source, '~/components/login/Branding.vue')
-    expectLiveImport(source, '~/components/login/FormFields.vue')
-    expectLiveImport(source, '~/components/login/Submit.vue')
     expect(source).toContain('layout: false')
   })
 
@@ -232,13 +348,8 @@ describe('component directories', () => {
   })
 
   it('imports signup components from the signup page without the shared chrome layout', () => {
-    // ページ名 Signup と prefix Signup* が重なると自動解決が乗らず、SSRとクライアントが食い違う
     const source = Object.values(signupPage)[0]
     expect(source).toBeDefined()
-    expectLiveImport(source, '~/components/signup/Branding.vue')
-    expectLiveImport(source, '~/components/signup/FormFields.vue')
-    expectLiveImport(source, '~/components/signup/TermsConsent.vue')
-    expectLiveImport(source, '~/components/signup/Submit.vue')
     expect(source).toContain('layout: false')
   })
 
@@ -251,12 +362,8 @@ describe('component directories', () => {
   })
 
   it('imports password-reset components from the form page without the shared chrome layout', () => {
-    // ページ名 PasswordReset と prefix PasswordReset* が重なると自動解決が乗らず、SSRとクライアントが食い違う
     const source = Object.entries(passwordResetPages).find(([path]) => path.endsWith('index.vue'))?.[1]
     expect(source).toBeDefined()
-    expectLiveImport(source, '~/components/password-reset/Branding.vue')
-    expectLiveImport(source, '~/components/password-reset/FormFields.vue')
-    expectLiveImport(source, '~/components/password-reset/Submit.vue')
     expect(source).toContain('layout: false')
     expect(source).toContain('navigateTo(passwordResetSentPath)')
   })
@@ -264,7 +371,6 @@ describe('component directories', () => {
   it('keeps the password-reset sent page without the shared chrome layout', () => {
     const source = Object.entries(passwordResetPages).find(([path]) => path.endsWith('sent.vue'))?.[1]
     expect(source).toBeDefined()
-    expect(source).toContain("~/components/password-reset/Branding.vue")
     expect(source).toContain('layout: false')
     expect(source).toContain('passwordResetSentTitle')
     expect(source).toContain('loginScreenLinkLabel')
@@ -281,29 +387,14 @@ describe('component directories', () => {
   })
 
   it('imports settings components from the settings page', () => {
-    // ページ名 Settings と prefix Settings* が重なると自動解決が乗らず、SSRとクライアントが食い違う
     const source = Object.values(settingsPage)[0]
     expect(source).toBeDefined()
-    expectLiveImport(source, '~/components/settings/AccountInfo.vue')
-    expectLiveImport(source, '~/components/settings/DeleteDialog.vue')
-    expectLiveImport(source, '~/components/settings/MembershipStatus.vue')
-    expectLiveImport(source, '~/components/settings/PaymentForm.vue')
-    expectLiveImport(source, '~/components/settings/PaymentCompleteDialog.vue')
     expect(source).toContain('registeredAccount')
     expect(source).toContain('maskEmail')
     expect(source).toContain('authenticated.value = null')
     expect(source).toContain('navigateTo(loginPath)')
     expect(source).toContain('markPaid')
     expect(source).toContain('paymentCompleteOpen')
-  })
-
-  it('keeps settings payment form card fields as live local state', () => {
-    const source = Object.entries(settingsSources).find(([path]) => path.includes('PaymentForm'))?.[1]
-    expect(source).toBeDefined()
-    expect(source).toMatch(/^const cardNumber = ref\(''\)$/m)
-    expect(source).toMatch(/^const cardExpiry = ref\(''\)$/m)
-    expect(source).toMatch(/^const cardCvc = ref\(''\)$/m)
-    expect(source).toMatch(/^const cardHolder = ref\(''\)$/m)
   })
 
   it('gates video delete and multi-file upload on paid membership', () => {
