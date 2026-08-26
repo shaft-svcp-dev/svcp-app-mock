@@ -83,4 +83,35 @@ describe('GitHub Project Pages base URL', () => {
     expect(workflow).toContain('nuxt build --preset github_pages')
     expect(workflow).toContain('./.output/public')
   })
+
+  it('enables Corepack after setup-node so npm ci uses packageManager 11 instead of the runner npm 10', () => {
+    const workflow = readFileSync(
+      join(repoRoot, '.github/workflows/deploy-github-pages.yml'),
+      'utf8',
+    )
+    const setupNodeAt = workflow.indexOf('actions/setup-node@')
+    const corepackEnableAt = workflow.indexOf('corepack enable')
+    const npmCiAt = workflow.indexOf('npm ci')
+
+    expect(setupNodeAt).toBeGreaterThan(-1)
+    expect(corepackEnableAt).toBeGreaterThan(setupNodeAt)
+    expect(workflow).toContain('corepack install')
+    expect(npmCiAt).toBeGreaterThan(corepackEnableAt)
+  })
+
+  it('does not require other-platform rolldown bindings during npm ci', () => {
+    const lockfile = JSON.parse(
+      readFileSync(join(repoRoot, 'package-lock.json'), 'utf8'),
+    ) as {
+      packages: Record<string, { optional?: boolean, extraneous?: boolean }>
+    }
+    const androidBinding = lockfile.packages['node_modules/@rolldown/binding-android-arm-eabi']
+
+    if (!androidBinding) {
+      return
+    }
+
+    expect(androidBinding.extraneous).toBeUndefined()
+    expect(androidBinding.optional).toBe(true)
+  })
 })

@@ -8,11 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: corepack enable
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
+      # setup-node が入れる npm 10 は、他OS向け native binding を必須インストールして EBADPLATFORM になる。
+      # package.json の packageManager (npm 11) は setup-node の後に有効化する。
+      - run: corepack enable
+      - run: corepack install
       - run: npm ci
       - run: npx nuxt build --preset github_pages
         env:
