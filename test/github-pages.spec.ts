@@ -71,13 +71,14 @@ describe('GitHub Project Pages base URL', () => {
     expect(nuxtConfig).toContain('prerenderRoutes')
   })
 
-  it('deploys from main with the repository name as the Project Pages base', () => {
+  it('deploys only from a manual workflow run with the repository name as the Project Pages base', () => {
     const workflow = readFileSync(
       join(repoRoot, '.github/workflows/deploy-github-pages.yml'),
       'utf8',
     )
 
-    expect(workflow).toMatch(/branches:\s*\r?\n\s*-\s*main/)
+    expect(workflow).toContain('workflow_dispatch:')
+    expect(workflow).not.toContain('push:')
     expect(workflow).toContain('NUXT_APP_BASE_URL: /${{ github.event.repository.name }}/')
     expect(workflow).toContain('nuxt build --preset github_pages')
     expect(workflow).toContain('./.output/public')

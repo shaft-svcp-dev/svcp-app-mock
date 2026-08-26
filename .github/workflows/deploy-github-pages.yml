@@ -1,10 +1,8 @@
 # https://github.com/actions/deploy-pages#usage
 name: Deploy to GitHub Pages
 on:
+  # main への push では公開しない。Actions 画面からの手動実行だけデプロイする
   workflow_dispatch:
-  push:
-    branches:
-      - main
 jobs:
   build:
     runs-on: ubuntu-latest
