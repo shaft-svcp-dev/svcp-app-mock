@@ -16,8 +16,8 @@ useHead({
   title: `${loginTitle} | ${productName}`,
 })
 
-const email = ref('')
-const password = ref('')
+const email = ref('test@shaft.bz')
+const password = ref('testtest')
 const authenticated = useAuthStorage()
 
 async function onSubmit() {
