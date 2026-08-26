@@ -31,7 +31,7 @@ function onFileChange(event: Event) {
 }
 
 function onDragOver(event: DragEvent) {
-  // preventDefault しなぁE�� drop がファイルを開くブラウザ既定動作になめE  event.preventDefault()
+  event.preventDefault()
 }
 
 function onDrop(event: DragEvent) {

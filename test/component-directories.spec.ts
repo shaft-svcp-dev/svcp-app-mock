@@ -412,6 +412,27 @@ describe('component directories', () => {
     expect(uploadSource).toContain(':multiple="isPaid"')
   })
 
+  it('starts the mock conversion pipeline when the upload page selects files', () => {
+    const uploadSource = Object.values(uploadPage)[0]
+    const pipelineSource = Object.entries(componentSourcesOnDisk).find(([path]) => {
+      return path.replaceAll('\\', '/').endsWith('components/upload/ConversionPipeline.vue')
+    })?.[1]
+    const dropZoneSource = Object.entries(componentSourcesOnDisk).find(([path]) => {
+      return path.replaceAll('\\', '/').endsWith('components/upload/DropZone.vue')
+    })?.[1]
+
+    expect(uploadSource).toBeDefined()
+    expect(pipelineSource).toBeDefined()
+    expect(dropZoneSource).toBeDefined()
+    expect(uploadSource).toContain('buildConversionSteps')
+    expect(uploadSource).toContain('progressPercentFromElapsed')
+    expect(uploadSource).toContain('startMockPipeline')
+    expect(uploadSource).toContain('onSelectFiles')
+    expect(pipelineSource).toContain('progressPercent')
+    expect(pipelineSource).toContain('progressLabel')
+    expect(dropZoneSource).toMatch(/function onDragOver[\s\S]*event\.preventDefault\(\)/)
+  })
+
   it('stores auth, membership, and deleted video ids in localStorage instead of cookies', () => {
     expect(fileNames(composableSources).sort()).toEqual([
       'useAuthStorage.ts',

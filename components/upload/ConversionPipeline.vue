@@ -2,13 +2,15 @@
 import {
   conversionPipelineNote,
   conversionPipelineTitle,
-  conversionProgressLabel,
   conversionStepLabel,
 } from '~/constants/upload'
-import {
-  conversionProgressPercent,
-  conversionSteps,
-} from '~/mocks/upload'
+import type { ConversionStep } from '~/mocks/upload'
+
+defineProps<{
+  steps: readonly ConversionStep[]
+  progressPercent: number
+  progressLabel: string
+}>()
 </script>
 
 <template>
@@ -19,7 +21,7 @@ import {
     <div class="stepper-track">
       <div class="stepper-nodes">
         <template
-          v-for="(step, index) in conversionSteps"
+          v-for="(step, index) in steps"
           :key="step.id"
         >
           <div class="step">
@@ -47,7 +49,7 @@ import {
             </span>
           </div>
           <div
-            v-if="index < conversionSteps.length - 1"
+            v-if="index < steps.length - 1"
             class="connector"
             :class="{ 'connector-complete': step.status === 'complete' }"
           />
@@ -56,13 +58,13 @@ import {
     </div>
     <div class="progress-bar-section">
       <div class="progress-labels">
-        <span class="progress-left">{{ conversionProgressLabel }}</span>
-        <span class="progress-right">{{ conversionProgressPercent }}%</span>
+        <span class="progress-left">{{ progressLabel }}</span>
+        <span class="progress-right">{{ progressPercent }}%</span>
       </div>
       <div class="bar-track">
         <div
           class="bar-fill"
-          :style="{ width: `${conversionProgressPercent}%` }"
+          :style="{ width: `${progressPercent}%` }"
         />
       </div>
       <p class="pipeline-note">

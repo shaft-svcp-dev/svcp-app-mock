@@ -12,6 +12,12 @@ export const freeUploadLimitNote
 export const paidUploadMultipleNote = '複数の動画をまとめて選択できます。'
 export const conversionPipelineTitle = '変換パイプライン進捗状況'
 export const conversionProgressLabel = '適応ビットレート動画を生成しています'
+export const conversionProgressCompleteLabel = '配信準備が完了しました'
+export const conversionProgressLabelByStep: Record<string, string> = {
+  upload: '動画をアップロードしています',
+  transcode: conversionProgressLabel,
+  distribute: '配信準備をしています',
+}
 export const conversionPipelineNote
   = `アップロードした動画は、自動的に複数ビットレートへ変換され、完了後はHLS形式で配信できます。変換中は動画一覧のステータスが${videoStatusLabel.unpublished}と表示されます。`
 

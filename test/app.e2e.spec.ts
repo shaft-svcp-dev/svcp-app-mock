@@ -69,7 +69,9 @@ import {
 import {
   conversionPipelineNote,
   conversionPipelineTitle,
+  conversionProgressCompleteLabel,
   conversionProgressLabel,
+  conversionProgressLabelByStep,
   conversionStepLabel,
   dropZoneSubtitle,
   dropZoneTitle,
@@ -121,12 +123,13 @@ import {
   registeredAccount,
 } from '../mocks/settings'
 import {
-  conversionProgressPercent,
-  conversionSteps,
+  buildConversionSteps,
+  conversionStepDurationMs,
+  conversionStepIds,
   formatFileSize,
   freeUploadLimit,
   limitSelectedFiles,
-  uploadingFile,
+  progressPercentFromElapsed,
   videoFileAccept,
 } from '../mocks/upload'
 import {
@@ -753,10 +756,16 @@ describe('SVCP mock screens', async () => {
     expect(html).toContain(selectFileButtonLabel)
     expect(html).toContain(conversionPipelineTitle)
     expect(html).toContain(conversionProgressLabel)
-    expect(html).toContain(`${conversionProgressPercent}%`)
+    expect(html).toMatch(/class="progress-right"[^>]*>\s*0%/)
     expect(html).toContain(conversionPipelineNote)
-    expect(html).toContain(uploadingFile.filename)
-    expect(html).toContain(uploadingFile.metadata)
+    expect(html).not.toContain(conversionProgressCompleteLabel)
+    const pipelineHtml = html.match(
+      /<section[^>]*class="[^"]*\bconversion-pipeline\b[^"]*"[^>]*>[\s\S]*?<\/section>/,
+    )?.[0]
+    expect(pipelineHtml).toBeDefined()
+    expect(pipelineHtml).toContain('step-circle-pending')
+    expect(pipelineHtml).not.toContain('step-circle-active')
+    expect(pipelineHtml).not.toContain('step-circle-complete')
     expect(html).toContain(freeUploadLimitNote)
     expect(html).not.toContain(paidUploadMultipleNote)
     expect(html).toContain(videoFileAccept)
@@ -775,8 +784,8 @@ describe('SVCP mock screens', async () => {
     expect(fileInput).toBeDefined()
     expect(fileInput).not.toMatch(/\bmultiple\b/)
 
-    for (const step of conversionSteps) {
-      expect(html).toContain(conversionStepLabel[step.id])
+    for (const stepId of conversionStepIds) {
+      expect(html).toContain(conversionStepLabel[stepId])
     }
 
     const dashboardNav = firstAnchorWithHref(html, '/')
@@ -791,6 +800,67 @@ describe('SVCP mock screens', async () => {
     expect(css).toMatch(/\.drop-zone\{[^}]*border:2pxdashed#2563eb/)
     expect(css).toMatch(/\.select-file-btn\{[^}]*white-space:nowrap/)
     expect(css).toMatch(/\.select-file-btn\{[^}]*width:auto/)
+  })
+
+  it('advances mock conversion steps from elapsed time without dummy file records', () => {
+    expect(conversionStepIds).toEqual(['upload', 'transcode', 'distribute'])
+    expect(conversionStepDurationMs).toBeGreaterThan(0)
+    expect(progressPercentFromElapsed(0, 3000)).toBe(0)
+    expect(progressPercentFromElapsed(1500, 3000)).toBe(50)
+    expect(progressPercentFromElapsed(3000, 3000)).toBe(100)
+    expect(progressPercentFromElapsed(4000, 3000)).toBe(100)
+    expect(progressPercentFromElapsed(-10, 3000)).toBe(0)
+
+    expect(buildConversionSteps(0, false).map(step => step.status)).toEqual([
+      'pending',
+      'pending',
+      'pending',
+    ])
+    expect(buildConversionSteps(80, false).map(step => step.status)).toEqual([
+      'pending',
+      'pending',
+      'pending',
+    ])
+    expect(buildConversionSteps(0, true).map(step => step.status)).toEqual([
+      'active',
+      'pending',
+      'pending',
+    ])
+    expect(buildConversionSteps(32, true).map(step => step.status)).toEqual([
+      'active',
+      'pending',
+      'pending',
+    ])
+    expect(buildConversionSteps(33, true).map(step => step.status)).toEqual([
+      'complete',
+      'active',
+      'pending',
+    ])
+    expect(buildConversionSteps(66, true).map(step => step.status)).toEqual([
+      'complete',
+      'active',
+      'pending',
+    ])
+    expect(buildConversionSteps(67, true).map(step => step.status)).toEqual([
+      'complete',
+      'complete',
+      'active',
+    ])
+    expect(buildConversionSteps(99, true).map(step => step.status)).toEqual([
+      'complete',
+      'complete',
+      'active',
+    ])
+    expect(buildConversionSteps(100, true).map(step => step.status)).toEqual([
+      'complete',
+      'complete',
+      'complete',
+    ])
+
+    expect(conversionProgressLabelByStep.upload).toBe('動画をアップロードしています')
+    expect(conversionProgressLabelByStep.transcode).toBe(conversionProgressLabel)
+    expect(conversionProgressLabelByStep.distribute).toBe('配信準備をしています')
+    expect(conversionProgressCompleteLabel).toBe('配信準備が完了しました')
   })
 
   it('renders the settings screen from mock account data with settings nav active', async () => {

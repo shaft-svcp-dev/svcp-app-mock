@@ -1,13 +1,8 @@
-import { videoListItems } from './videos'
-
-/**
- * UIモック。API未接続のため、画面表示専用の固定データ。
- * 変換中ファイルは一覧の unpublished レコード。filename 枠は stretch のため幅から復元できない。
- */
 export type ConversionStepStatus = 'complete' | 'active' | 'pending'
+export type ConversionStepId = 'upload' | 'transcode' | 'distribute'
 
 export interface ConversionStep {
-  id: string
+  id: ConversionStepId
   status: ConversionStepStatus
 }
 
@@ -18,7 +13,10 @@ export interface UploadingFile {
 
 export const videoFileAccept = 'video/mp4,video/webm,video/quicktime'
 export const freeUploadLimit = 1
-export const conversionProgressPercent = 72
+export const conversionStepIds = ['upload', 'transcode', 'distribute'] as const
+// 実変換はしない。選択後に3ステップが順に完了して見える間隔
+export const conversionStepDurationMs = 1000
+export const conversionProgressTickMs = 50
 
 export function isAllowedVideoFile(file: File): boolean {
   if (file.type.startsWith('video/')) {
@@ -50,19 +48,40 @@ export function formatFileSize(bytes: number): string {
   return `${(kilobytes / 1024).toFixed(1)} MB`
 }
 
-export const conversionSteps: readonly ConversionStep[] = [
-  { id: 'upload', status: 'complete' },
-  { id: 'transcode', status: 'active' },
-  { id: 'distribute', status: 'pending' },
-]
-
-const unpublishedVideo = videoListItems.find(video => video.status === 'unpublished')
-
-if (!unpublishedVideo) {
-  throw new Error('非公開中の動画が一覧モックにない')
+export function pipelineTotalDurationMs(): number {
+  return conversionStepDurationMs * conversionStepIds.length
 }
 
-export const uploadingFile: UploadingFile = {
-  filename: unpublishedVideo.title,
-  metadata: `${unpublishedVideo.duration} • ${unpublishedVideo.size}`,
+export function progressPercentFromElapsed(elapsedMs: number, totalDurationMs: number): number {
+  if (totalDurationMs <= 0) {
+    return 100
+  }
+
+  return Math.min(100, Math.max(0, Math.round((elapsedMs / totalDurationMs) * 100)))
+}
+
+export function buildConversionSteps(
+  progressPercent: number,
+  started: boolean,
+): ConversionStep[] {
+  // 0% は未選択と開始直後で同じなので、開始前は進捗に関係なく pending にする
+  if (!started) {
+    return conversionStepIds.map(id => ({ id, status: 'pending' }))
+  }
+
+  const clamped = Math.min(100, Math.max(0, Math.round(progressPercent)))
+
+  return conversionStepIds.map((id, index) => {
+    const stepEndPercent = Math.round(((index + 1) / conversionStepIds.length) * 100)
+    const stepStartPercent = Math.round((index / conversionStepIds.length) * 100)
+    if (clamped >= stepEndPercent) {
+      return { id, status: 'complete' }
+    }
+
+    if (clamped >= stepStartPercent) {
+      return { id, status: 'active' }
+    }
+
+    return { id, status: 'pending' }
+  })
 }
