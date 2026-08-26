@@ -1,3 +1,8 @@
+import { readNuxtAppBaseURL, resolveAppBaseURL } from './app-base-url'
+import { prerenderRoutes } from './prerender-routes'
+
+const githubPagesBaseURL = readNuxtAppBaseURL()
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-08-20',
   devtools: {
@@ -54,6 +59,8 @@ export default defineNuxtConfig({
     },
   ],
   app: {
+    // 未設定時はローカルの / 。GitHub Actions がリポジトリ名を NUXT_APP_BASE_URL に渡す
+    baseURL: resolveAppBaseURL(githubPagesBaseURL),
     head: {
       title: 'ダッシュボード | SVCP',
       link: [
@@ -66,4 +73,13 @@ export default defineNuxtConfig({
       ],
     },
   },
+  // 常時 prerender すると /videos の静的 HTML が ?status= を潰し、通常の SSR / e2e が壊れる
+  nitro: githubPagesBaseURL
+    ? {
+        prerender: {
+          crawlLinks: true,
+          routes: prerenderRoutes,
+        },
+      }
+    : undefined,
 })

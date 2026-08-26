@@ -418,6 +418,7 @@ describe('component directories', () => {
       'useClientStorage.ts',
       'useDeletedVideoIds.ts',
       'useMembership.ts',
+      'usePublicAssetPath.ts',
     ])
 
     const authSource = Object.entries(composableSources).find(([path]) => {

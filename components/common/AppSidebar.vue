@@ -11,6 +11,7 @@ import {
 import { dashboardNavPath, dashboardPath } from '~/routes'
 
 const route = useRoute()
+const toPublicSrc = usePublicAssetPath()
 
 function navPath(id: string): string {
   const path = dashboardNavPath[id]
@@ -60,7 +61,7 @@ function isActiveNav(to: string): boolean {
       >
         <img
           class="avatar"
-          :src="dashboardUser.avatarSrc"
+          :src="toPublicSrc(dashboardUser.avatarSrc)"
           :alt="dashboardUser.avatarAlt"
         >
       </NuxtLink>

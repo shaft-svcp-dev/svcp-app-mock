@@ -8,6 +8,7 @@ import {
 import { thumbnailFileAccept } from '~/mocks/video-detail'
 
 const src = defineModel<string>('src', { required: true })
+const toPublicSrc = usePublicAssetPath()
 
 const props = defineProps<{
   originalSrc: string
@@ -29,7 +30,6 @@ function isAllowedThumbnail(file: File) {
 }
 
 function revokeIfBlob(url: string) {
-  // 一覧レコード�E静的パスは取り消さなぁE���Eレビュー用 blob だけ解放する
   if (url.startsWith('blob:')) {
     URL.revokeObjectURL(url)
   }
@@ -80,7 +80,7 @@ onUnmounted(() => {
     </h2>
     <img
       class="thumbnail-preview"
-      :src="src"
+      :src="toPublicSrc(src)"
       :alt="alt"
     >
     <p class="media-settings-hint">

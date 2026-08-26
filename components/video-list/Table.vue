@@ -7,6 +7,8 @@ import { videoListPath } from '~/routes'
 defineProps<{
   videos: readonly VideoListItem[]
 }>()
+
+const toPublicSrc = usePublicAssetPath()
 </script>
 
 <template>
@@ -30,7 +32,7 @@ defineProps<{
       >
         <img
           class="col-thumbnail video-thumb"
-          :src="video.thumbnailSrc"
+          :src="toPublicSrc(video.thumbnailSrc)"
           :alt="video.thumbnailAlt"
         >
         <span class="col-title table-title">{{ video.title }}</span>

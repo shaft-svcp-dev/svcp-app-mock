@@ -6,6 +6,8 @@ import { videoListPath } from '~/routes'
 defineProps<{
   upload: RecentUpload
 }>()
+
+const toPublicSrc = usePublicAssetPath()
 </script>
 
 <template>
@@ -15,7 +17,7 @@ defineProps<{
   >
     <img
       class="video-thumb"
-      :src="upload.thumbnailSrc"
+      :src="toPublicSrc(upload.thumbnailSrc)"
       :alt="upload.thumbnailAlt"
     >
     <div class="meta-content">

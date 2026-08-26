@@ -9,14 +9,16 @@ defineProps<{
   posterSrc: string
   subtitles: readonly VideoSubtitleTrack[]
 }>()
+
+const toPublicSrc = usePublicAssetPath()
 </script>
 
 <template>
   <div class="video-player-container">
     <video
       class="video-player"
-      :src="videoPlaybackSrc"
-      :poster="posterSrc"
+      :src="toPublicSrc(videoPlaybackSrc)"
+      :poster="toPublicSrc(posterSrc)"
       :aria-label="video.thumbnailAlt"
       controls
       playsinline
@@ -26,7 +28,7 @@ defineProps<{
         v-for="(track, index) in subtitles"
         :key="track.id"
         kind="subtitles"
-        :src="track.src"
+        :src="toPublicSrc(track.src)"
         :srclang="track.srclang"
         :label="track.label"
         :default="index === 0"
